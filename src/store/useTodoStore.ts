@@ -14,10 +14,14 @@ const toDateStr = (date: Date): string =>
 interface TodoStore {
   todos: Todo[]
   todoCounts: Record<string, number>
+  importantCounts: Record<string, number>
+  completedCounts: Record<string, number>
+  hideCompletedFromCalendar: boolean
   selectedDate: Date
   isLoading: boolean
   setSelectedDate: (date: Date) => Promise<void>
   loadTodoCounts: () => Promise<void>
+  setHideCompletedFromCalendar: (value: boolean) => void
   addTodo: (text: string) => Promise<void>
   toggleTodo: (id: string) => Promise<void>
   toggleImportant: (id: string) => Promise<void>
@@ -27,6 +31,9 @@ interface TodoStore {
 export const useTodoStore = create<TodoStore>((set, get) => ({
   todos: [],
   todoCounts: {},
+  importantCounts: {},
+  completedCounts: {},
+  hideCompletedFromCalendar: localStorage.getItem('hideCompletedFromCalendar') === 'true',
   selectedDate: new Date(),
   isLoading: false,
 
@@ -52,13 +59,22 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     try {
       const rows = await window.electronAPI.todos.getAll()
       const counts: Record<string, number> = {}
+      const importantCounts: Record<string, number> = {}
+      const completedCounts: Record<string, number> = {}
       rows.forEach((row) => {
         counts[row.date] = row.count
+        importantCounts[row.date] = row.importantCount
+        completedCounts[row.date] = row.completedCount
       })
-      set({ todoCounts: counts })
+      set({ todoCounts: counts, importantCounts, completedCounts })
     } catch {
       // silently fail
     }
+  },
+
+  setHideCompletedFromCalendar: (value: boolean) => {
+    localStorage.setItem('hideCompletedFromCalendar', String(value))
+    set({ hideCompletedFromCalendar: value })
   },
 
   addTodo: async (text: string) => {
@@ -72,17 +88,21 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   toggleTodo: async (id: string) => {
-    const { todos } = get()
+    const { todos, selectedDate, completedCounts } = get()
     const updated = todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    set({ todos: updated })
+    const dateStr = toDateStr(selectedDate)
+    const newCompletedCount = updated.filter((t) => t.completed).length
+    set({ todos: updated, completedCounts: { ...completedCounts, [dateStr]: newCompletedCount } })
     const todo = updated.find((t) => t.id === id)!
     await window.electronAPI.todos.update({ id, completed: todo.completed, important: todo.important })
   },
 
   toggleImportant: async (id: string) => {
-    const { todos } = get()
+    const { todos, selectedDate, importantCounts } = get()
     const updated = todos.map((t) => (t.id === id ? { ...t, important: !t.important } : t))
-    set({ todos: updated })
+    const dateStr = toDateStr(selectedDate)
+    const newImportantCount = updated.filter((t) => t.important).length
+    set({ todos: updated, importantCounts: { ...importantCounts, [dateStr]: newImportantCount } })
     const todo = updated.find((t) => t.id === id)!
     await window.electronAPI.todos.update({ id, completed: todo.completed, important: todo.important })
   },

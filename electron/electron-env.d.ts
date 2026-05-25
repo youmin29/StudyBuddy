@@ -18,6 +18,8 @@ interface TodoRow {
 interface TodoCountRow {
   date: string
   count: number
+  importantCount: number
+  completedCount: number
 }
 
 interface ElectronTodoAPI {

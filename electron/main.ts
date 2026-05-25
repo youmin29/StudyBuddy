@@ -43,7 +43,15 @@ function setupIpcHandlers() {
   })
 
   ipcMain.handle('todos:getAll', () => {
-    return db.prepare('SELECT date, COUNT(*) as count FROM todos GROUP BY date').all()
+    return db
+      .prepare(
+        `SELECT date,
+          COUNT(*) as count,
+          SUM(CASE WHEN important=1 THEN 1 ELSE 0 END) as importantCount,
+          SUM(CASE WHEN completed=1 THEN 1 ELSE 0 END) as completedCount
+        FROM todos GROUP BY date`
+      )
+      .all()
   })
 
   ipcMain.handle('todos:add', (_event, todo: { id: string; text: string; date: string }) => {

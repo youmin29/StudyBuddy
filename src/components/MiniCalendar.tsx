@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import { useTodoStore } from '../store/useTodoStore'
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export default function MiniCalendar() {
-  const { selectedDate, todoCounts, setSelectedDate } = useTodoStore()
+  const { selectedDate, todoCounts, importantCounts, completedCounts, hideCompletedFromCalendar, setSelectedDate } = useTodoStore()
   const [viewMonth, setViewMonth] = useState(new Date())
 
   const year = viewMonth.getFullYear()
@@ -83,6 +83,12 @@ export default function MiniCalendar() {
             const day = i + 1
             const dateStr = toDateStr(day)
             const count = todoCounts[dateStr] ?? 0
+            const impCount = importantCounts[dateStr] ?? 0
+            const completedCount = completedCounts[dateStr] ?? 0
+            const allCompleted = count > 0 && completedCount === count
+            const showIndicators = !(hideCompletedFromCalendar && allCompleted)
+            const hasImportant = impCount > 0 && showIndicators
+            const hasRegular = count - impCount > 0 && showIndicators
             const selected = isSelected(day)
             const today = isToday(day)
 
@@ -113,15 +119,17 @@ export default function MiniCalendar() {
                 >
                   {day}
                 </span>
-                {count > 0 && !selected && (
-                  <div className="flex gap-0.5 mt-0.5">
-                    {Array.from({ length: Math.min(count, 3) }).map((_, j) => (
+                {(hasImportant || hasRegular) && !selected && (
+                  <div className="flex gap-0.5 mt-0.5 items-center">
+                    {hasImportant && (
+                      <Star className="w-2 h-2 text-pink-500 fill-pink-500" />
+                    )}
+                    {hasRegular && (
                       <div
-                        key={j}
                         className="w-1 h-1 rounded-full"
                         style={{ background: 'linear-gradient(135deg, #FF6B9D, #C239B3)' }}
                       />
-                    ))}
+                    )}
                   </div>
                 )}
                 {!selected && (
