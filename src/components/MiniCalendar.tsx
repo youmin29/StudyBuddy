@@ -119,15 +119,18 @@ export default function MiniCalendar() {
                 >
                   {day}
                 </span>
-                {(hasImportant || hasRegular) && !selected && (
+                {(hasImportant || hasRegular) && (
                   <div className="flex gap-0.5 mt-0.5 items-center">
                     {hasImportant && (
-                      <Star className="w-2 h-2 text-pink-500 fill-pink-500" />
+                      <Star
+                        className="w-2 h-2"
+                        style={{ color: selected ? 'white' : '#EC4899', fill: selected ? 'white' : '#EC4899' }}
+                      />
                     )}
                     {hasRegular && (
                       <div
                         className="w-1 h-1 rounded-full"
-                        style={{ background: 'linear-gradient(135deg, #FF6B9D, #C239B3)' }}
+                        style={{ background: selected ? 'white' : 'linear-gradient(135deg, #FF6B9D, #C239B3)' }}
                       />
                     )}
                   </div>
