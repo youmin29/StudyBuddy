@@ -29,7 +29,7 @@ jobs:
         run: npm ci
 
       - name: 빌드
-        run: npm run build
+        run: npm run build:ci
 
       - name: DMG 업로드
         uses: actions/upload-artifact@v4
@@ -57,7 +57,7 @@ jobs:
         run: npm ci
 
       - name: 빌드
-        run: npm run build
+        run: npm run build:ci
 
       - name: EXE 업로드
         uses: actions/upload-artifact@v4
