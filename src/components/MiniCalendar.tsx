@@ -42,7 +42,7 @@ export default function MiniCalendar() {
         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.1)',
       }}
     >
-      <div className="p-4 h-full flex flex-col">
+      <div className="p-4">
         {/* Month Navigation */}
         <div className="flex items-center justify-between mb-4">
           <button
@@ -73,10 +73,10 @@ export default function MiniCalendar() {
           ))}
         </div>
 
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1 flex-1">
+        {/* Calendar Grid – h-8 고정 높이로 창 너비와 무관하게 일정 */}
+        <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-            <div key={`empty-${i}`} />
+            <div key={`empty-${i}`} className="h-8" />
           ))}
 
           {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -90,7 +90,7 @@ export default function MiniCalendar() {
               <button
                 key={day}
                 onClick={() => handleSelect(day)}
-                className="aspect-square rounded-lg transition-all relative group"
+                className="h-8 w-full rounded-lg transition-all relative group flex flex-col items-center justify-center"
                 style={{
                   background: selected
                     ? 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)'
@@ -102,30 +102,28 @@ export default function MiniCalendar() {
                     : undefined,
                 }}
               >
-                <div className="w-full h-full flex flex-col items-center justify-center">
-                  <span
-                    className={`text-xs font-medium ${
-                      selected
-                        ? 'text-white font-bold'
-                        : today
-                        ? 'text-pink-600 font-bold'
-                        : 'text-pink-700'
-                    }`}
-                  >
-                    {day}
-                  </span>
-                  {count > 0 && !selected && (
-                    <div className="flex gap-0.5 mt-0.5">
-                      {Array.from({ length: Math.min(count, 3) }).map((_, j) => (
-                        <div
-                          key={j}
-                          className="w-1 h-1 rounded-full"
-                          style={{ background: 'linear-gradient(135deg, #FF6B9D, #C239B3)' }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <span
+                  className={`text-xs font-medium leading-none ${
+                    selected
+                      ? 'text-white font-bold'
+                      : today
+                      ? 'text-pink-600 font-bold'
+                      : 'text-pink-700'
+                  }`}
+                >
+                  {day}
+                </span>
+                {count > 0 && !selected && (
+                  <div className="flex gap-0.5 mt-0.5">
+                    {Array.from({ length: Math.min(count, 3) }).map((_, j) => (
+                      <div
+                        key={j}
+                        className="w-1 h-1 rounded-full"
+                        style={{ background: 'linear-gradient(135deg, #FF6B9D, #C239B3)' }}
+                      />
+                    ))}
+                  </div>
+                )}
                 {!selected && (
                   <div className="absolute inset-0 bg-pink-200/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
                 )}
@@ -135,13 +133,12 @@ export default function MiniCalendar() {
         </div>
 
         {/* Selected Date Label */}
-        <div className="mt-3 pt-3 border-t border-pink-200">
+        <div className="mt-2 pt-2 border-t border-pink-200">
           <p className="text-xs text-center text-pink-400">
             {selectedDate.toLocaleDateString('ko-KR', {
-              year: 'numeric',
               month: 'long',
               day: 'numeric',
-              weekday: 'long',
+              weekday: 'short',
             })}
           </p>
         </div>

@@ -36,14 +36,14 @@ export default function Home() {
         <Header />
 
         {/* Main Content */}
-        <div className="flex-1 p-5 overflow-auto">
+        <div className="flex-1 min-h-0 p-5 overflow-y-auto">
           {/* YouTube Player */}
           <div className="mb-5">
             <YouTubePlayer />
           </div>
 
-          {/* Calendar + Todo */}
-          <div className="grid gap-5" style={{ gridTemplateColumns: '2fr 3fr', height: '360px' }}>
+          {/* Calendar + Todo – 자연 높이로 나란히 */}
+          <div className="grid gap-5" style={{ gridTemplateColumns: '2fr 3fr' }}>
             <MiniCalendar />
             <TodoPanel />
           </div>

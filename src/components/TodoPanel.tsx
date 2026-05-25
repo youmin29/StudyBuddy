@@ -28,13 +28,13 @@ export default function TodoPanel() {
 
   return (
     <div
-      className="rounded-2xl overflow-hidden h-full flex flex-col"
+      className="rounded-2xl overflow-hidden"
       style={{
         background: 'linear-gradient(135deg, #E8F9FF 0%, #F8E8FF 100%)',
         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.1)',
       }}
     >
-      <div className="p-4 flex flex-col h-full">
+      <div className="p-4">
         {/* Header */}
         <div className="mb-4">
           <h3 className="font-bold text-purple-700" style={{ fontSize: '16px' }}>
@@ -71,8 +71,8 @@ export default function TodoPanel() {
 
         {/* Todo List */}
         <div
-          className="flex-1 overflow-y-auto space-y-2 pr-1"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: '#D8B4FE #F3E8FF' }}
+          className="overflow-y-auto space-y-2 pr-1"
+          style={{ maxHeight: '220px', scrollbarWidth: 'thin', scrollbarColor: '#D8B4FE #F3E8FF' }}
         >
           {isLoading ? (
             <div className="text-center py-8 text-purple-400 text-sm">불러오는 중...</div>
