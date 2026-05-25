@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import YouTube from 'react-youtube'
 import {
   Play,
@@ -30,6 +30,16 @@ export default function YouTubePlayer() {
   const [volume, setVolume] = useState(70)
   const [savedPlaylists, setSavedPlaylists] = useState<SavedPlaylist[]>([])
   const [currentPlaylist, setCurrentPlaylist] = useState<SavedPlaylist | null>(null)
+
+  useEffect(() => {
+    window.electronAPI.playlists.get().then((stored) => {
+      const loaded: SavedPlaylist[] = stored.map((p) => ({
+        ...p,
+        lastPlayed: p.lastPlayed ? new Date(p.lastPlayed) : undefined,
+      }))
+      setSavedPlaylists(loaded)
+    })
+  }, [])
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [playlistName, setPlaylistName] = useState('')
   const [playlistEmoji, setPlaylistEmoji] = useState('🎵')
@@ -91,23 +101,37 @@ export default function YouTubePlayer() {
     playerRef.current?.setVolume?.(v)
   }
 
+  const persistPlaylists = (updated: SavedPlaylist[]) => {
+    window.electronAPI.playlists.save(
+      updated.map((p) => ({ ...p, lastPlayed: p.lastPlayed?.toISOString() }))
+    )
+  }
+
   const loadPlaylist = (playlist: SavedPlaylist) => {
     setCurrentPlaylist(playlist)
     setInputValue(playlist.url)
     setUrl(playlist.url)
-    setSavedPlaylists((prev) =>
-      prev.map((p) => (p.id === playlist.id ? { ...p, lastPlayed: new Date() } : p))
-    )
+    setSavedPlaylists((prev) => {
+      const updated = prev.map((p) => (p.id === playlist.id ? { ...p, lastPlayed: new Date() } : p))
+      persistPlaylists(updated)
+      return updated
+    })
   }
 
   const toggleFavorite = (playlistId: string) => {
-    setSavedPlaylists((prev) =>
-      prev.map((p) => (p.id === playlistId ? { ...p, isFavorite: !p.isFavorite } : p))
-    )
+    setSavedPlaylists((prev) => {
+      const updated = prev.map((p) => (p.id === playlistId ? { ...p, isFavorite: !p.isFavorite } : p))
+      persistPlaylists(updated)
+      return updated
+    })
   }
 
   const deletePlaylist = (playlistId: string) => {
-    setSavedPlaylists((prev) => prev.filter((p) => p.id !== playlistId))
+    setSavedPlaylists((prev) => {
+      const updated = prev.filter((p) => p.id !== playlistId)
+      persistPlaylists(updated)
+      return updated
+    })
     if (currentPlaylist?.id === playlistId) setCurrentPlaylist(null)
   }
 
@@ -121,7 +145,11 @@ export default function YouTubePlayer() {
         isFavorite: false,
         lastPlayed: new Date(),
       }
-      setSavedPlaylists((prev) => [...prev, newPlaylist])
+      setSavedPlaylists((prev) => {
+        const updated = [...prev, newPlaylist]
+        persistPlaylists(updated)
+        return updated
+      })
       setCurrentPlaylist(newPlaylist)
       setPlaylistName('')
       setPlaylistEmoji('🎵')
@@ -144,7 +172,7 @@ export default function YouTubePlayer() {
     height: '100%',
     playerVars: {
       autoplay: 1 as const,
-      ...(listId ? { list: listId, listType: 'playlist' as const } : {}),
+...(listId ? { list: listId, listType: 'playlist' as const } : {}),
     },
   }
 

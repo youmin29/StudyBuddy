@@ -10,6 +10,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('todos:update', todo),
     delete: (id: string) => ipcRenderer.invoke('todos:delete', id),
   },
+  playlists: {
+    get: () => ipcRenderer.invoke('playlists:get'),
+    save: (playlists: unknown) => ipcRenderer.invoke('playlists:save', playlists),
+  },
+  settings: {
+    get: () => ipcRenderer.invoke('settings:get'),
+    set: (key: string, value: unknown) => ipcRenderer.invoke('settings:set', key, value),
+  },
 })
 
 contextBridge.exposeInMainWorld('ipcRenderer', {

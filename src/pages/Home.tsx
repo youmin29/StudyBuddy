@@ -6,10 +6,11 @@ import TodoPanel from '../components/TodoPanel'
 import { useTodoStore } from '../store/useTodoStore'
 
 export default function Home() {
-  const { setSelectedDate, loadTodoCounts } = useTodoStore()
+  const { setSelectedDate, loadTodoCounts, loadSettings } = useTodoStore()
 
   useEffect(() => {
     loadTodoCounts()
+    loadSettings()
     setSelectedDate(new Date())
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

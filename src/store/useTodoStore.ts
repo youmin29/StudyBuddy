@@ -22,7 +22,8 @@ interface TodoStore {
   isLoading: boolean
   setSelectedDate: (date: Date) => Promise<void>
   loadTodoCounts: () => Promise<void>
-  setHideCompletedFromCalendar: (value: boolean) => void
+  loadSettings: () => Promise<void>
+  setHideCompletedFromCalendar: (value: boolean) => Promise<void>
   addTodo: (text: string) => Promise<void>
   toggleTodo: (id: string) => Promise<void>
   toggleImportant: (id: string) => Promise<void>
@@ -35,7 +36,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   importantCounts: {},
   completedCounts: {},
   completedImportantCounts: {},
-  hideCompletedFromCalendar: localStorage.getItem('hideCompletedFromCalendar') === 'true',
+  hideCompletedFromCalendar: false,
   selectedDate: new Date(),
   isLoading: false,
 
@@ -76,9 +77,18 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     }
   },
 
-  setHideCompletedFromCalendar: (value: boolean) => {
-    localStorage.setItem('hideCompletedFromCalendar', String(value))
+  loadSettings: async () => {
+    try {
+      const s = await window.electronAPI.settings.get()
+      set({ hideCompletedFromCalendar: s['hideCompletedFromCalendar'] === true })
+    } catch {
+      // silently fail
+    }
+  },
+
+  setHideCompletedFromCalendar: async (value: boolean) => {
     set({ hideCompletedFromCalendar: value })
+    await window.electronAPI.settings.set('hideCompletedFromCalendar', value)
   },
 
   addTodo: async (text: string) => {

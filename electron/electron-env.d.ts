@@ -31,9 +31,26 @@ interface ElectronTodoAPI {
   delete: (id: string) => Promise<{ success: boolean }>
 }
 
+interface StoredPlaylist {
+  id: string
+  name: string
+  url: string
+  emoji: string
+  isFavorite: boolean
+  lastPlayed?: string
+}
+
 interface Window {
   electronAPI: {
     todos: ElectronTodoAPI
+    playlists: {
+      get: () => Promise<StoredPlaylist[]>
+      save: (playlists: StoredPlaylist[]) => Promise<{ success: boolean }>
+    }
+    settings: {
+      get: () => Promise<Record<string, unknown>>
+      set: (key: string, value: unknown) => Promise<{ success: boolean }>
+    }
   }
   ipcRenderer: import('electron').IpcRenderer
 }
