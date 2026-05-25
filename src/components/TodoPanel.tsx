@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Star, Trash2 } from 'lucide-react'
+import { Plus, Star, Trash2, Sparkles, Heart } from 'lucide-react'
 import { useTodoStore } from '../store/useTodoStore'
 
 export default function TodoPanel() {
@@ -23,8 +23,9 @@ export default function TodoPanel() {
     weekday: 'short',
   })
 
+  const importantTodos = todos.filter((t) => t.important)
+  const regularTodos = todos.filter((t) => !t.important)
   const completedCount = todos.filter((t) => t.completed).length
-  const importantCount = todos.filter((t) => t.important).length
 
   return (
     <div
@@ -71,8 +72,8 @@ export default function TodoPanel() {
 
         {/* Todo List */}
         <div
-          className="overflow-y-auto space-y-2 pr-1"
-          style={{ maxHeight: '220px', scrollbarWidth: 'thin', scrollbarColor: '#D8B4FE #F3E8FF' }}
+          className="overflow-y-auto overflow-x-hidden px-3"
+          style={{ maxHeight: '240px', scrollbarWidth: 'thin', scrollbarColor: '#D8B4FE #F3E8FF' }}
         >
           {isLoading ? (
             <div className="text-center py-8 text-purple-400 text-sm">불러오는 중...</div>
@@ -90,92 +91,215 @@ export default function TodoPanel() {
               </div>
             </div>
           ) : (
-            todos.map((todo) => (
-              <div
-                key={todo.id}
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-3 border border-white/80 transition-all hover:shadow-md group"
-                style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 4px rgba(0,0,0,0.06)' }}
-              >
-                <div className="flex items-start gap-2">
-                  {/* Checkbox */}
-                  <button
-                    onClick={() => toggleTodo(todo.id)}
-                    className="mt-0.5 flex-shrink-0"
-                  >
-                    <div
-                      className="w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center"
-                      style={{
-                        borderColor: todo.completed ? '#C084FC' : '#D8B4FE',
-                        background: todo.completed
-                          ? 'linear-gradient(135deg, #A78BFA 0%, #C084FC 100%)'
-                          : 'white',
-                        boxShadow: todo.completed
-                          ? 'inset 0 1px 0 rgba(255,255,255,0.4)'
-                          : 'inset 0 1px 2px rgba(0,0,0,0.08)',
-                      }}
-                    >
-                      {todo.completed && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="3"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+            <div className="space-y-4">
+              {/* Important Tasks Section */}
+              {importantTodos.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-200 to-purple-200 px-3 py-1.5 rounded-full shadow-sm">
+                      <Star className="w-3.5 h-3.5 text-pink-600 fill-pink-600" />
+                      <span className="text-xs font-bold text-pink-700">Important Tasks</span>
+                      <Sparkles className="w-3 h-3 text-yellow-500 fill-yellow-400" />
                     </div>
-                  </button>
+                  </div>
 
-                  {/* Text */}
-                  <p
-                    className={`flex-1 text-sm break-words min-w-0 ${
-                      todo.completed ? 'line-through text-purple-400' : 'text-purple-700'
-                    }`}
-                  >
-                    {todo.text}
-                  </p>
+                  <div className="space-y-2.5 mb-4">
+                    {importantTodos.map((todo) => (
+                      <div key={todo.id} className="relative group">
+                        <div
+                          className="absolute inset-0 rounded-2xl blur-md opacity-60"
+                          style={{ background: 'linear-gradient(135deg, #FFB6D9 0%, #E5BCFF 100%)' }}
+                        />
+                        <div
+                          className="relative rounded-2xl p-3 border-2 transition-all hover:scale-[1.02]"
+                          style={{
+                            background: 'linear-gradient(135deg, #FFF0F8 0%, #F8F0FF 100%)',
+                            borderColor: 'rgba(255, 182, 217, 0.6)',
+                            boxShadow:
+                              'inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 12px rgba(255,107,157,0.25)',
+                          }}
+                        >
+                          {/* Corner heart badge */}
+                          <div className="absolute -top-2 -right-2">
+                            <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-full p-1.5 shadow-lg">
+                              <Heart className="w-3 h-3 text-white fill-white" />
+                            </div>
+                          </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <button
-                      onClick={() => toggleImportant(todo.id)}
-                      className="p-1 rounded-lg hover:bg-pink-100 transition-all"
-                      title={todo.important ? '중요 해제' : '중요 표시'}
-                    >
-                      <Star
-                        className={`w-4 h-4 ${
-                          todo.important ? 'text-pink-500 fill-pink-500' : 'text-purple-300'
-                        }`}
-                      />
-                    </button>
-                    <button
-                      onClick={() => deleteTodo(todo.id)}
-                      className="p-1 rounded-lg hover:bg-red-100 transition-all"
-                      title="삭제"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-400" />
-                    </button>
+                          <div className="flex items-start gap-3">
+                            <button
+                              onClick={() => toggleTodo(todo.id)}
+                              className="mt-0.5 flex-shrink-0"
+                            >
+                              <div
+                                className="w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center"
+                                style={{
+                                  borderColor: todo.completed ? '#EC4899' : '#F9A8D4',
+                                  background: todo.completed
+                                    ? 'linear-gradient(135deg, #FF6B9D 0%, #EC4899 100%)'
+                                    : 'white',
+                                  boxShadow: todo.completed
+                                    ? 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(236,72,153,0.5)'
+                                    : 'inset 0 1px 2px rgba(0,0,0,0.1)',
+                                }}
+                              >
+                                {todo.completed && (
+                                  <svg
+                                    className="w-4 h-4 text-white"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="3"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                            </button>
+
+                            <p
+                              className={`flex-1 text-sm font-medium break-words min-w-0 mt-0.5 ${
+                                todo.completed ? 'line-through text-pink-400' : 'text-pink-700'
+                              }`}
+                            >
+                              {todo.text}
+                            </p>
+
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => toggleImportant(todo.id)}
+                                className="p-1.5 rounded-lg transition-all"
+                                style={{
+                                  background: 'linear-gradient(135deg, #FFF0F8 0%, #FFE5F0 100%)',
+                                }}
+                                title="중요 해제"
+                              >
+                                <Star className="w-4 h-4 text-pink-500 fill-pink-500" />
+                              </button>
+                              <button
+                                onClick={() => deleteTodo(todo.id)}
+                                className="p-1.5 rounded-lg hover:bg-red-100 transition-all"
+                                title="삭제"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-400" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Divider */}
+                  {regularTodos.length > 0 && (
+                    <div className="flex items-center gap-2 my-3">
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent" />
+                      <div className="text-xs text-purple-300">♡</div>
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent" />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Regular Tasks Section */}
+              {regularTodos.length > 0 && (
+                <div>
+                  {importantTodos.length > 0 && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="bg-purple-100/60 px-3 py-1.5 rounded-full">
+                        <span className="text-xs font-medium text-purple-600">Regular Tasks</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {regularTodos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="bg-white/80 backdrop-blur-sm rounded-xl p-3 border border-white/80 transition-all hover:shadow-md group"
+                        style={{
+                          boxShadow:
+                            'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 4px rgba(0,0,0,0.06)',
+                        }}
+                      >
+                        <div className="flex items-start gap-2">
+                          <button
+                            onClick={() => toggleTodo(todo.id)}
+                            className="mt-0.5 flex-shrink-0"
+                          >
+                            <div
+                              className="w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center"
+                              style={{
+                                borderColor: todo.completed ? '#C084FC' : '#D8B4FE',
+                                background: todo.completed
+                                  ? 'linear-gradient(135deg, #A78BFA 0%, #C084FC 100%)'
+                                  : 'white',
+                                boxShadow: todo.completed
+                                  ? 'inset 0 1px 0 rgba(255,255,255,0.4)'
+                                  : 'inset 0 1px 2px rgba(0,0,0,0.08)',
+                              }}
+                            >
+                              {todo.completed && (
+                                <svg
+                                  className="w-3 h-3 text-white"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="3"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                          </button>
+
+                          <p
+                            className={`flex-1 text-sm break-words min-w-0 ${
+                              todo.completed ? 'line-through text-purple-400' : 'text-purple-700'
+                            }`}
+                          >
+                            {todo.text}
+                          </p>
+
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                            <button
+                              onClick={() => toggleImportant(todo.id)}
+                              className="p-1 rounded-lg hover:bg-pink-100 transition-all"
+                              title="중요 표시"
+                            >
+                              <Star className="w-4 h-4 text-purple-300" />
+                            </button>
+                            <button
+                              onClick={() => deleteTodo(todo.id)}
+                              className="p-1 rounded-lg hover:bg-red-100 transition-all"
+                              title="삭제"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
-            ))
+              )}
+            </div>
           )}
         </div>
 
         {/* Stats */}
         {todos.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-purple-200 flex-shrink-0">
+          <div className="mt-4 pt-3 border-t border-purple-200">
             <div className="flex justify-between text-xs">
               <span className="text-purple-500">
                 {completedCount} / {todos.length} 완료
               </span>
-              <span className="text-pink-500">{importantCount}개 중요</span>
+              <span className="text-pink-500">{importantTodos.length}개 중요</span>
             </div>
-            {/* Progress bar */}
             <div className="mt-2 h-1.5 bg-purple-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-300"
