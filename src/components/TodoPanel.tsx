@@ -24,7 +24,7 @@ export default function TodoPanel() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleAdd();
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) handleAdd();
   };
 
   const dateLabel = selectedDate.toLocaleDateString("ko-KR", {
