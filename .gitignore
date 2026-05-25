@@ -2,6 +2,7 @@
 node_modules/
 
 # Build outputs
+build/
 dist/
 dist-ssr/
 dist-electron/
@@ -50,3 +51,31 @@ lerna-debug.log*
 *.local
 *.pem
 .npm/
+
+# Tailwind / cache
+.cache/
+.temp/
+.tmp/
+
+# Vite
+vite.config.ts.timestamp-*
+
+# Electron Builder
+*.blockmap
+*.dmg
+*.exe
+*.zip
+*.AppImage
+
+# Coverage
+coverage/
+
+# TypeScript
+*.tsbuildinfo
+
+# pnpm
+.pnpm-store/
+
+# Optional lock files (사용 안 하는 패키지 매니저면)
+yarn.lock
+pnpm-lock.yaml
