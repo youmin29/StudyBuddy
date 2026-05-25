@@ -1,0 +1,90 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # ─────────────────────────────────────────
+  # macOS 빌드 → DMG
+  # ─────────────────────────────────────────
+  build-mac:
+    name: macOS 빌드
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 빌드
+        run: npm run build
+
+      - name: DMG 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-build
+          path: release/**/*.dmg
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────
+  # Windows 빌드 → EXE
+  # ─────────────────────────────────────────
+  build-windows:
+    name: Windows 빌드
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 빌드
+        run: npm run build
+
+      - name: EXE 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: release/**/*.exe
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────
+  # 태그 push 시 GitHub Releases에 자동 배포
+  # ─────────────────────────────────────────
+  release:
+    name: 릴리즈 배포
+    needs: [build-mac, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: 아티팩트 다운로드
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: GitHub 릴리즈 생성 및 파일 업로드
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          draft: false
+          prerelease: false
