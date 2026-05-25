@@ -32,6 +32,14 @@ export default function YouTubePlayer() {
   const [currentPlaylist, setCurrentPlaylist] = useState<SavedPlaylist | null>(null)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [playlistName, setPlaylistName] = useState('')
+  const [playlistEmoji, setPlaylistEmoji] = useState('🎵')
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+
+  const PRESET_EMOJIS = [
+    '🎵', '🎶', '🎸', '🎹', '🎺', '🎻', '🥁', '🎤', '🎧', '🎼',
+    '☁️', '🌙', '📖', '💖', '🎃', '❄️', '🌊', '🌸', '⭐', '✨',
+    '🔥', '💫', '🍀', '🎭', '🎨',
+  ]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null)
 
@@ -109,15 +117,24 @@ export default function YouTubePlayer() {
         id: Date.now().toString(),
         name: playlistName,
         url: inputValue.trim(),
-        emoji: '🎵',
+        emoji: playlistEmoji,
         isFavorite: false,
         lastPlayed: new Date(),
       }
       setSavedPlaylists((prev) => [...prev, newPlaylist])
       setCurrentPlaylist(newPlaylist)
       setPlaylistName('')
+      setPlaylistEmoji('🎵')
+      setShowEmojiPicker(false)
       setShowSaveDialog(false)
     }
+  }
+
+  const closeSaveDialog = () => {
+    setShowSaveDialog(false)
+    setPlaylistName('')
+    setPlaylistEmoji('🎵')
+    setShowEmojiPicker(false)
   }
 
   const hasMedia = videoId !== null || listId !== null
@@ -237,29 +254,72 @@ export default function YouTubePlayer() {
                 boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.1)',
               }}
             >
-              <input
-                type="text"
-                placeholder="플레이리스트 이름..."
-                value={playlistName}
-                onChange={(e) => setPlaylistName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && saveCurrentPlaylist()}
-                className="w-full px-3 py-2 mb-2 text-sm rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none transition-all"
-                style={{ background: 'white', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.08)' }}
-              />
+              {/* Emoji + Name input row */}
+              <div className="flex gap-2 mb-2">
+                {/* Emoji button */}
+                <button
+                  onClick={() => setShowEmojiPicker((v) => !v)}
+                  className="w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center text-xl transition-all hover:scale-105 active:scale-95"
+                  style={{
+                    background: showEmojiPicker ? 'rgba(255,182,217,0.2)' : 'white',
+                    border: `2px solid ${showEmojiPicker ? 'rgba(249,168,212,0.8)' : 'rgba(249,168,212,0.6)'}`,
+                    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)',
+                  }}
+                >
+                  {playlistEmoji}
+                </button>
+
+                {/* Name input */}
+                <input
+                  type="text"
+                  placeholder="플레이리스트 이름..."
+                  value={playlistName}
+                  onChange={(e) => setPlaylistName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && saveCurrentPlaylist()}
+                  className="flex-1 px-3 py-2 text-sm rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none transition-all"
+                  style={{ background: 'white', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.08)' }}
+                />
+              </div>
+
+              {/* Inline emoji grid */}
+              {showEmojiPicker && (
+                <div
+                  className="mb-2 p-2 rounded-xl"
+                  style={{
+                    background: 'white',
+                    border: '1.5px solid rgba(249,168,212,0.4)',
+                    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div className="grid grid-cols-5 gap-1">
+                    {PRESET_EMOJIS.map((e) => (
+                      <button
+                        key={e}
+                        onClick={() => { setPlaylistEmoji(e); setShowEmojiPicker(false) }}
+                        className={`h-8 rounded-lg text-base flex items-center justify-center transition-all hover:scale-110 ${
+                          playlistEmoji === e ? 'bg-pink-100' : 'hover:bg-pink-50'
+                        }`}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <button
                   onClick={saveCurrentPlaylist}
                   className="flex-1 px-3 py-2 text-sm rounded-xl transition-all hover:scale-105"
                   style={{
                     background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)',
-                    boxShadow:
-                      'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(255,107,157,0.4)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(255,107,157,0.4)',
                   }}
                 >
                   <span className="text-white font-medium">Save</span>
                 </button>
                 <button
-                  onClick={() => setShowSaveDialog(false)}
+                  onClick={closeSaveDialog}
                   className="px-4 py-2 text-sm rounded-xl transition-all bg-white/60 hover:bg-white/80"
                 >
                   <span className="text-purple-600">Cancel</span>

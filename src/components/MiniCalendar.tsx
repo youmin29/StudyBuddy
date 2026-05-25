@@ -5,7 +5,7 @@ import { useTodoStore } from '../store/useTodoStore'
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export default function MiniCalendar() {
-  const { selectedDate, todoCounts, importantCounts, completedCounts, hideCompletedFromCalendar, setSelectedDate } = useTodoStore()
+  const { selectedDate, todoCounts, importantCounts, completedCounts, completedImportantCounts, hideCompletedFromCalendar, setSelectedDate } = useTodoStore()
   const [viewMonth, setViewMonth] = useState(new Date())
 
   const year = viewMonth.getFullYear()
@@ -84,11 +84,15 @@ export default function MiniCalendar() {
             const dateStr = toDateStr(day)
             const count = todoCounts[dateStr] ?? 0
             const impCount = importantCounts[dateStr] ?? 0
-            const completedCount = completedCounts[dateStr] ?? 0
-            const allCompleted = count > 0 && completedCount === count
-            const showIndicators = !(hideCompletedFromCalendar && allCompleted)
-            const hasImportant = impCount > 0 && showIndicators
-            const hasRegular = count - impCount > 0 && showIndicators
+            const regularCount = count - impCount
+            const completedImpCount = completedImportantCounts[dateStr] ?? 0
+            const completedRegCount = (completedCounts[dateStr] ?? 0) - completedImpCount
+            const hasImportant = impCount > 0 && (
+              !hideCompletedFromCalendar || completedImpCount < impCount
+            )
+            const hasRegular = regularCount > 0 && (
+              !hideCompletedFromCalendar || completedRegCount < regularCount
+            )
             const selected = isSelected(day)
             const today = isToday(day)
 

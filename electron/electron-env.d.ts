@@ -20,6 +20,7 @@ interface TodoCountRow {
   count: number
   importantCount: number
   completedCount: number
+  completedImportantCount: number
 }
 
 interface ElectronTodoAPI {

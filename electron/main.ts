@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, session } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -48,7 +48,8 @@ function setupIpcHandlers() {
         `SELECT date,
           COUNT(*) as count,
           SUM(CASE WHEN important=1 THEN 1 ELSE 0 END) as importantCount,
-          SUM(CASE WHEN completed=1 THEN 1 ELSE 0 END) as completedCount
+          SUM(CASE WHEN completed=1 THEN 1 ELSE 0 END) as completedCount,
+          SUM(CASE WHEN completed=1 AND important=1 THEN 1 ELSE 0 END) as completedImportantCount
         FROM todos GROUP BY date`
       )
       .all()
@@ -94,6 +95,10 @@ function createWindow() {
     },
   })
 
+  win.webContents.setUserAgent(
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+  )
+
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })
@@ -121,5 +126,16 @@ app.on('activate', () => {
 app.whenReady().then(() => {
   initDatabase()
   setupIpcHandlers()
+
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    { urls: ['*://www.youtube.com/*', '*://*.youtube.com/*', '*://*.googlevideo.com/*'] },
+    (details, callback) => {
+      const headers = { ...details.requestHeaders }
+      headers['Referer'] = 'https://www.youtube.com/'
+      headers['Origin'] = 'https://www.youtube.com'
+      callback({ requestHeaders: headers })
+    }
+  )
+
   createWindow()
 })

@@ -16,6 +16,7 @@ interface TodoStore {
   todoCounts: Record<string, number>
   importantCounts: Record<string, number>
   completedCounts: Record<string, number>
+  completedImportantCounts: Record<string, number>
   hideCompletedFromCalendar: boolean
   selectedDate: Date
   isLoading: boolean
@@ -33,6 +34,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   todoCounts: {},
   importantCounts: {},
   completedCounts: {},
+  completedImportantCounts: {},
   hideCompletedFromCalendar: localStorage.getItem('hideCompletedFromCalendar') === 'true',
   selectedDate: new Date(),
   isLoading: false,
@@ -61,12 +63,14 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
       const counts: Record<string, number> = {}
       const importantCounts: Record<string, number> = {}
       const completedCounts: Record<string, number> = {}
+      const completedImportantCounts: Record<string, number> = {}
       rows.forEach((row) => {
         counts[row.date] = row.count
         importantCounts[row.date] = row.importantCount
         completedCounts[row.date] = row.completedCount
+        completedImportantCounts[row.date] = row.completedImportantCount
       })
-      set({ todoCounts: counts, importantCounts, completedCounts })
+      set({ todoCounts: counts, importantCounts, completedCounts, completedImportantCounts })
     } catch {
       // silently fail
     }
@@ -88,21 +92,31 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   toggleTodo: async (id: string) => {
-    const { todos, selectedDate, completedCounts } = get()
+    const { todos, selectedDate, completedCounts, completedImportantCounts } = get()
     const updated = todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
     const dateStr = toDateStr(selectedDate)
     const newCompletedCount = updated.filter((t) => t.completed).length
-    set({ todos: updated, completedCounts: { ...completedCounts, [dateStr]: newCompletedCount } })
+    const newCompletedImportantCount = updated.filter((t) => t.completed && t.important).length
+    set({
+      todos: updated,
+      completedCounts: { ...completedCounts, [dateStr]: newCompletedCount },
+      completedImportantCounts: { ...completedImportantCounts, [dateStr]: newCompletedImportantCount },
+    })
     const todo = updated.find((t) => t.id === id)!
     await window.electronAPI.todos.update({ id, completed: todo.completed, important: todo.important })
   },
 
   toggleImportant: async (id: string) => {
-    const { todos, selectedDate, importantCounts } = get()
+    const { todos, selectedDate, importantCounts, completedImportantCounts } = get()
     const updated = todos.map((t) => (t.id === id ? { ...t, important: !t.important } : t))
     const dateStr = toDateStr(selectedDate)
     const newImportantCount = updated.filter((t) => t.important).length
-    set({ todos: updated, importantCounts: { ...importantCounts, [dateStr]: newImportantCount } })
+    const newCompletedImportantCount = updated.filter((t) => t.important && t.completed).length
+    set({
+      todos: updated,
+      importantCounts: { ...importantCounts, [dateStr]: newImportantCount },
+      completedImportantCounts: { ...completedImportantCounts, [dateStr]: newCompletedImportantCount },
+    })
     const todo = updated.find((t) => t.id === id)!
     await window.electronAPI.todos.update({ id, completed: todo.completed, important: todo.important })
   },

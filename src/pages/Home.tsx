@@ -49,14 +49,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Decorative bottom strip */}
-        <div
-          className="h-2 flex-shrink-0"
-          style={{
-            background: 'linear-gradient(135deg, #FFB6D9 0%, #D4A5F5 50%, #A8D8F0 100%)',
-            borderRadius: '0 0 28px 28px',
-          }}
-        />
       </div>
     </div>
   )
