@@ -1,0 +1,50 @@
+import { create } from 'zustand'
+import type { User } from '@supabase/supabase-js'
+import { supabase } from '../lib/supabase'
+
+interface AuthStore {
+  user: User | null
+  loading: boolean
+  signIn: (email: string, password: string) => Promise<string | null>
+  signUp: (
+    email: string,
+    password: string
+  ) => Promise<{ error: string | null; needsConfirmation: boolean }>
+  signOut: () => Promise<void>
+  loadUser: () => Promise<void>
+}
+
+export const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
+  loading: true,
+
+  loadUser: async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    set({ user: session?.user ?? null, loading: false })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      set({ user: session?.user ?? null })
+    })
+  },
+
+  signIn: async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return error.message
+    return null
+  },
+
+  signUp: async (email, password) => {
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) return { error: error.message, needsConfirmation: false }
+    // 이메일 확인이 필요한 경우 session이 null
+    const needsConfirmation = !data.session
+    return { error: null, needsConfirmation }
+  },
+
+  signOut: async () => {
+    await supabase.auth.signOut()
+    set({ user: null })
+  },
+}))
