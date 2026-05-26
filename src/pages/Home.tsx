@@ -4,16 +4,21 @@ import YouTubePlayer from '../components/YouTubePlayer'
 import MiniCalendar from '../components/MiniCalendar'
 import TodoPanel from '../components/TodoPanel'
 import { useTodoStore } from '../store/useTodoStore'
+import { useAuthStore } from '../store/useAuthStore'
 
 export default function Home() {
+  const { user, loading } = useAuthStore()
   const { setSelectedDate, loadTodoCounts, loadSettings } = useTodoStore()
 
+  // 로그인 상태가 바뀔 때마다 (로그인·로그아웃·초기 로드) 데이터 새로 로드
+  // loading이 false가 된 후부터 user 변화를 감지
   useEffect(() => {
+    if (loading) return
     loadTodoCounts()
     loadSettings()
     setSelectedDate(new Date())
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [user, loading])
 
   return (
     <div
@@ -33,23 +38,17 @@ export default function Home() {
           border: '1px solid rgba(255,255,255,0.6)',
         }}
       >
-        {/* Header */}
         <Header />
 
-        {/* Main Content */}
         <div className="flex-1 min-h-0 p-5 overflow-y-auto">
-          {/* YouTube Player */}
           <div className="mb-5">
             <YouTubePlayer />
           </div>
-
-          {/* Calendar + Todo – 자연 높이로 나란히 */}
           <div className="grid gap-5" style={{ gridTemplateColumns: '2fr 3fr' }}>
             <MiniCalendar />
             <TodoPanel />
           </div>
         </div>
-
       </div>
     </div>
   )

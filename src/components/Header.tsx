@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Heart, Music, Sparkles, CloudOff } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
+import { useTodoStore } from '../store/useTodoStore'
+import { syncLocalToCloud } from '../lib/sync'
 import AuthModal from './AuthModal'
 import ProfileMenu from './ProfileMenu'
+import SyncModal from './SyncModal'
 
 export default function Header() {
-  const { user, loadUser } = useAuthStore()
+  const { user, loadUser, bumpSync } = useAuthStore()
+  const { loadTodoCounts, loadSettings, setSelectedDate } = useTodoStore()
   const [now, setNow] = useState(new Date())
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showSyncModal, setShowSyncModal] = useState(false)
 
   useEffect(() => {
     loadUser()
@@ -29,9 +34,36 @@ export default function Header() {
     second: '2-digit',
   })
 
+  // 업로드: 로컬 → Supabase, 완료 후 전체 데이터 재로드
+  const handleUpload = async () => {
+    const result = await syncLocalToCloud()
+    if (!result.success) throw new Error(result.error)
+
+    // 업로드 완료 후 Supabase에서 새로 불러오기
+    bumpSync()                   // YouTubePlayer 플레이리스트 재로드
+    await loadTodoCounts()
+    await loadSettings()
+    await setSelectedDate(new Date())
+
+    return result.uploaded!      // { todos, playlists }
+  }
+
+  // 클라우드 사용: 로그인 시 이미 Supabase 데이터가 로드됐으므로 모달만 닫기
+  const handleUseCloud = () => setShowSyncModal(false)
+
   return (
     <>
-      <AuthModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <AuthModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={() => setShowSyncModal(true)}
+      />
+      <SyncModal
+        isOpen={showSyncModal}
+        onUpload={handleUpload}
+        onUseCloud={handleUseCloud}
+        onSkip={() => setShowSyncModal(false)}
+      />
 
       <div
         className="relative overflow-hidden rounded-t-[28px] select-none"
@@ -75,7 +107,6 @@ export default function Header() {
             className="flex items-center gap-3"
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           >
-            {/* Account Section */}
             {user ? (
               <ProfileMenu />
             ) : (
@@ -97,7 +128,6 @@ export default function Header() {
               </button>
             )}
 
-            {/* Date & Time */}
             <div className="bg-white/25 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/40 shadow-md">
               <div className="text-xs text-white/80 drop-shadow-sm mb-0.5">{dateStr}</div>
               <div

@@ -14,6 +14,8 @@ import {
   Music2,
 } from 'lucide-react'
 import { usePlayerStore } from '../store/usePlayerStore'
+import { useAuthStore } from '../store/useAuthStore'
+import { supabase } from '../lib/supabase'
 
 interface SavedPlaylist {
   id: string
@@ -26,20 +28,49 @@ interface SavedPlaylist {
 
 export default function YouTubePlayer() {
   const { videoId, listId, isPlaying, setUrl, setIsPlaying } = usePlayerStore()
+  const { user, syncVersion } = useAuthStore()
   const [inputValue, setInputValue] = useState('')
   const [volume, setVolume] = useState(70)
   const [savedPlaylists, setSavedPlaylists] = useState<SavedPlaylist[]>([])
   const [currentPlaylist, setCurrentPlaylist] = useState<SavedPlaylist | null>(null)
 
+  // user 변경 시(로그인·로그아웃)마다 플레이리스트 다시 로드
   useEffect(() => {
-    window.electronAPI.playlists.get().then((stored) => {
-      const loaded: SavedPlaylist[] = stored.map((p) => ({
-        ...p,
-        lastPlayed: p.lastPlayed ? new Date(p.lastPlayed) : undefined,
-      }))
-      setSavedPlaylists(loaded)
-    })
-  }, [])
+    const load = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session) {
+        // 🌐 Supabase
+        const { data } = await supabase
+          .from('playlists')
+          .select('*')
+          .order('last_played', { ascending: false, nullsFirst: false })
+        if (!data) return
+        setSavedPlaylists(
+          data.map((p) => ({
+            id: p.id,
+            name: p.name,
+            url: p.url,
+            emoji: p.emoji,
+            isFavorite: p.is_favorite,
+            lastPlayed: p.last_played ? new Date(p.last_played) : undefined,
+          }))
+        )
+      } else {
+        // 💾 로컬 IPC
+        const stored = await window.electronAPI.playlists.get()
+        setSavedPlaylists(
+          stored.map((p) => ({
+            ...p,
+            lastPlayed: p.lastPlayed ? new Date(p.lastPlayed) : undefined,
+          }))
+        )
+      }
+    }
+    load()
+  }, [user, syncVersion])
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [playlistName, setPlaylistName] = useState('')
   const [playlistEmoji, setPlaylistEmoji] = useState('🎵')
@@ -101,10 +132,33 @@ export default function YouTubePlayer() {
     playerRef.current?.setVolume?.(v)
   }
 
-  const persistPlaylists = (updated: SavedPlaylist[]) => {
-    window.electronAPI.playlists.save(
-      updated.map((p) => ({ ...p, lastPlayed: p.lastPlayed?.toISOString() }))
-    )
+  const persistPlaylists = async (updated: SavedPlaylist[]) => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (session) {
+      // 🌐 Supabase — 전체 삭제 후 재삽입
+      await supabase.from('playlists').delete().eq('user_id', session.user.id)
+      if (updated.length > 0) {
+        await supabase.from('playlists').insert(
+          updated.map((p) => ({
+            id: p.id,
+            user_id: session.user.id,
+            name: p.name,
+            url: p.url,
+            emoji: p.emoji,
+            is_favorite: p.isFavorite,
+            last_played: p.lastPlayed?.toISOString() ?? null,
+          }))
+        )
+      }
+    } else {
+      // 💾 로컬 IPC
+      window.electronAPI.playlists.save(
+        updated.map((p) => ({ ...p, lastPlayed: p.lastPlayed?.toISOString() }))
+      )
+    }
   }
 
   const loadPlaylist = (playlist: SavedPlaylist) => {

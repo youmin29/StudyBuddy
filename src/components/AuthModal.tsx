@@ -16,9 +16,10 @@ import { useAuthStore } from '../store/useAuthStore'
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
+  onLoginSuccess?: () => void
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
   const { signIn, signUp } = useAuthStore()
 
   const [tab, setTab] = useState<'login' | 'signup'>('login')
@@ -46,6 +47,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setError(err)
       } else {
         onClose()
+        onLoginSuccess?.()   // 로그인 성공 → SyncModal 트리거
       }
     } else {
       const { error: err, needsConfirmation } = await signUp(email, password)

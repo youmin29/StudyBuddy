@@ -122,6 +122,10 @@ function setupIpcHandlers() {
     return { success: true }
   })
 
+  ipcMain.handle('todos:getAllFull', () => {
+    return db.prepare('SELECT * FROM todos ORDER BY date, created_at').all()
+  })
+
   ipcMain.handle('playlists:get', () => {
     const filePath = path.join(app.getPath('userData'), 'playlists.json')
     try {

@@ -15,6 +15,15 @@ interface TodoRow {
   date: string
 }
 
+interface TodoFullRow {
+  id: string
+  text: string
+  completed: number | boolean
+  important: number | boolean
+  date: string
+  created_at: string
+}
+
 interface TodoCountRow {
   date: string
   count: number
@@ -26,6 +35,7 @@ interface TodoCountRow {
 interface ElectronTodoAPI {
   getByDate: (date: string) => Promise<TodoRow[]>
   getAll: () => Promise<TodoCountRow[]>
+  getAllFull: () => Promise<TodoFullRow[]>
   add: (todo: { id: string; text: string; date: string }) => Promise<{ success: boolean }>
   update: (todo: { id: string; completed: boolean; important: boolean }) => Promise<{ success: boolean }>
   delete: (id: string) => Promise<{ success: boolean }>

@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase'
 interface AuthStore {
   user: User | null
   loading: boolean
+  syncVersion: number   // 업로드 완료 시 증가 → 각 컴포넌트가 데이터 재로드
+  bumpSync: () => void
   signIn: (email: string, password: string) => Promise<string | null>
   signUp: (
     email: string,
@@ -17,6 +19,8 @@ interface AuthStore {
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   loading: true,
+  syncVersion: 0,
+  bumpSync: () => set((s) => ({ syncVersion: s.syncVersion + 1 })),
 
   loadUser: async () => {
     const {

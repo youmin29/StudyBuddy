@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   todos: {
     getByDate: (date: string) => ipcRenderer.invoke('todos:getByDate', date),
     getAll: () => ipcRenderer.invoke('todos:getAll'),
+    getAllFull: () => ipcRenderer.invoke('todos:getAllFull'),
     add: (todo: { id: string; text: string; date: string }) =>
       ipcRenderer.invoke('todos:add', todo),
     update: (todo: { id: string; completed: boolean; important: boolean }) =>
