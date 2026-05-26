@@ -33,6 +33,9 @@ export default function YouTubePlayer() {
   const [volume, setVolume] = useState(70)
   const [savedPlaylists, setSavedPlaylists] = useState<SavedPlaylist[]>([])
   const [currentPlaylist, setCurrentPlaylist] = useState<SavedPlaylist | null>(null)
+  const [isShuffle, setIsShuffle] = useState(false)
+  const [isRepeat, setIsRepeat] = useState(false)
+  const isRepeatRef = useRef(false)
 
   // user 변경 시(로그인·로그아웃)마다 플레이리스트 다시 로드
   useEffect(() => {
@@ -106,7 +109,13 @@ export default function YouTubePlayer() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onStateChange = (event: any) => {
-    setIsPlaying(event.data === 1)
+    const state = event.data
+    setIsPlaying(state === 1)
+    // 단일 영상 반복: 영상 종료(0) 시 처음부터 재생
+    if (state === 0 && isRepeatRef.current && !listId) {
+      playerRef.current?.seekTo(0, true)
+      playerRef.current?.playVideo()
+    }
   }
 
   const togglePlay = () => {
@@ -116,14 +125,6 @@ export default function YouTubePlayer() {
     } else {
       playerRef.current.playVideo()
     }
-  }
-
-  const skipNext = () => {
-    playerRef.current?.nextVideo?.()
-  }
-
-  const handleShuffle = () => {
-    playerRef.current?.setShuffle?.(true)
   }
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,6 +218,38 @@ export default function YouTubePlayer() {
     setPlaylistName('')
     setPlaylistEmoji('🎵')
     setShowEmojiPicker(false)
+  }
+
+  // 셔플: YouTube 플레이리스트일 때만 작동
+  const canShuffle = !!listId
+  const handleShuffle = () => {
+    if (!canShuffle) return
+    const next = !isShuffle
+    setIsShuffle(next)
+    playerRef.current?.setShuffle?.(next)
+  }
+
+  // 다음 곡: 플레이리스트 → nextVideo() / 단일 영상 → 라이브러리 다음 항목
+  const canSkipNext = !!listId || savedPlaylists.length > 0
+  const skipNext = () => {
+    if (listId) {
+      playerRef.current?.nextVideo?.()
+    } else {
+      if (savedPlaylists.length === 0) return
+      const currentIndex = currentPlaylist
+        ? savedPlaylists.findIndex((p) => p.id === currentPlaylist.id)
+        : -1
+      const nextIndex = (currentIndex + 1) % savedPlaylists.length
+      loadPlaylist(savedPlaylists[nextIndex])
+    }
+  }
+
+  // 반복: 플레이리스트 → setLoop / 단일 영상 → onStateChange에서 처리
+  const handleRepeat = () => {
+    const next = !isRepeat
+    setIsRepeat(next)
+    isRepeatRef.current = next
+    if (listId) playerRef.current?.setLoop?.(next)
   }
 
   const hasMedia = videoId !== null || listId !== null
@@ -418,12 +451,22 @@ export default function YouTubePlayer() {
             }}
           >
             <div className="flex items-center justify-center gap-3 mb-3">
+              {/* 셔플: 플레이리스트일 때만 활성 */}
               <button
                 onClick={handleShuffle}
-                title="셔플"
-                className="p-2 rounded-xl hover:bg-purple-100 transition-all"
+                title={canShuffle ? (isShuffle ? '셔플 끄기' : '셔플 켜기') : '플레이리스트에서만 사용 가능'}
+                disabled={!canShuffle}
+                className="p-2 rounded-xl transition-all"
+                style={{
+                  background: isShuffle ? 'rgba(167,139,250,0.2)' : 'transparent',
+                  cursor: canShuffle ? 'pointer' : 'not-allowed',
+                  opacity: canShuffle ? 1 : 0.35,
+                }}
               >
-                <Shuffle className="w-5 h-5 text-purple-500" />
+                <Shuffle
+                  className="w-5 h-5"
+                  style={{ color: isShuffle ? '#7C3AED' : '#A78BFA' }}
+                />
               </button>
 
               <button
@@ -442,16 +485,36 @@ export default function YouTubePlayer() {
                 )}
               </button>
 
+              {/* 다음 곡: 플레이리스트 or 라이브러리에 항목 있을 때 활성 */}
               <button
                 onClick={skipNext}
-                title="다음 곡"
-                className="p-2 rounded-xl hover:bg-purple-100 transition-all"
+                title={canSkipNext ? '다음 곡' : '재생할 항목 없음'}
+                disabled={!canSkipNext}
+                className="p-2 rounded-xl transition-all"
+                style={{
+                  cursor: canSkipNext ? 'pointer' : 'not-allowed',
+                  opacity: canSkipNext ? 1 : 0.35,
+                }}
               >
-                <SkipForward className="w-5 h-5 text-purple-500" />
+                <SkipForward
+                  className="w-5 h-5"
+                  style={{ color: canSkipNext ? '#A78BFA' : '#C4B5FD' }}
+                />
               </button>
 
-              <button title="반복" className="p-2 rounded-xl hover:bg-purple-100 transition-all">
-                <Repeat className="w-5 h-5 text-purple-500" />
+              {/* 반복: 항상 사용 가능 */}
+              <button
+                onClick={handleRepeat}
+                title={isRepeat ? '반복 끄기' : '반복 켜기'}
+                className="p-2 rounded-xl transition-all"
+                style={{
+                  background: isRepeat ? 'rgba(167,139,250,0.2)' : 'transparent',
+                }}
+              >
+                <Repeat
+                  className="w-5 h-5"
+                  style={{ color: isRepeat ? '#7C3AED' : '#A78BFA' }}
+                />
               </button>
             </div>
 
