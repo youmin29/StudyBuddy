@@ -1,8 +1,11 @@
 ## 🚑 버그 수정
 
-### Windows 앱 아이콘 수정
-- Windows 설치 시 기본 Electron 로고가 표시되던 문제를 수정했어요
-- Study Buddy 전용 아이콘이 올바르게 표시돼요 (16 · 32 · 48 · 64 · 128 · 256px)
+### 배포 앱에서 로그인 기능 미작동 수정
+- GitHub Actions 빌드 시 Supabase 환경변수가 주입되지 않아 배포된 앱에서 로그인이 되지 않던 문제를 수정했어요
+- 이제 DMG · EXE 설치 버전에서도 로그인 및 클라우드 동기화가 정상 작동해요
+
+### 릴리즈 노트 자동 생성 수정
+- GitHub Releases 페이지에 릴리즈 노트가 표시되지 않던 문제를 수정했어요
 
 ---
 
@@ -10,7 +13,7 @@
 
 | 플랫폼 | 파일 |
 |--------|------|
-| macOS | `Study Buddy-Mac-1.1.1-Installer.dmg` |
-| Windows | `Study Buddy-Windows-1.1.1-Setup.exe` |
+| macOS | `Study Buddy-Mac-1.1.3-Installer.dmg` |
+| Windows | `Study Buddy-Windows-1.1.3-Setup.exe` |
 
 > ⚠️ **macOS** — "개발자를 확인할 수 없음" 경고가 뜨면 `시스템 설정 → 개인 정보 보호 및 보안`에서 허용하거나, `우클릭 → 열기`로 실행하세요.
