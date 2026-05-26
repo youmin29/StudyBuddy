@@ -3,6 +3,9 @@ node_modules/
 
 # Build outputs
 build/
+!build/icon.ico
+!build/icon.icns
+!build/icon.png
 dist/
 dist-ssr/
 dist-electron/
