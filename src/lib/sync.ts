@@ -10,10 +10,18 @@ export interface SyncResult {
 }
 
 /**
- * 로컬 IPC 데이터를 Supabase 클라우드에 업로드
- * - 투두: id 기준 upsert (중복 방지)
- * - 플레이리스트: 전체 교체
- * - 설정: upsert
+ * 로컬 IPC 데이터를 Supabase 클라우드에 업로드 (병합 방식)
+ *
+ * [투두]
+ *   - id 기준 upsert → 새 항목만 추가, 기존 항목은 최신값으로 업데이트
+ *   - 다른 기기에서 올린 투두는 그대로 유지 (덮어쓰지 않음)
+ *
+ * [플레이리스트]
+ *   - 클라우드에 이미 같은 URL이 있으면 스킵, 없는 것만 추가
+ *   - 다른 기기의 플레이리스트가 사라지지 않음
+ *
+ * [설정]
+ *   - upsert (마지막 업로드 기준으로 덮어쓰기)
  */
 export async function syncLocalToCloud(): Promise<SyncResult> {
   const {
@@ -30,7 +38,10 @@ export async function syncLocalToCloud(): Promise<SyncResult> {
     // ── 1. 투두리스트 ──────────────────────────────
     const localTodos = await window.electronAPI.todos.getAllFull()
 
+    let uploadedTodos = 0
     if (localTodos.length > 0) {
+      // id 기준 upsert: 같은 id면 업데이트, 새 id면 삽입
+      // 클라우드에만 있는 항목(다른 기기에서 올린 것)은 건드리지 않음
       const { error } = await supabase.from('todos').upsert(
         localTodos.map((t) => ({
           id: t.id,
@@ -44,31 +55,41 @@ export async function syncLocalToCloud(): Promise<SyncResult> {
         { onConflict: 'id' }
       )
       if (error) throw new Error(`투두 업로드 실패: ${error.message}`)
+      uploadedTodos = localTodos.length
     }
 
     // ── 2. 플레이리스트 ────────────────────────────
     const localPlaylists = await window.electronAPI.playlists.get()
 
-    // 기존 클라우드 데이터 삭제 후 로컬 데이터로 덮어쓰기
-    const { error: delErr } = await supabase
-      .from('playlists')
-      .delete()
-      .eq('user_id', userId)
-    if (delErr) throw new Error(`플레이리스트 초기화 실패: ${delErr.message}`)
-
+    let uploadedPlaylists = 0
     if (localPlaylists.length > 0) {
-      const { error } = await supabase.from('playlists').insert(
-        localPlaylists.map((p) => ({
-          id: p.id,
-          user_id: userId,
-          name: p.name,
-          url: p.url,
-          emoji: p.emoji,
-          is_favorite: p.isFavorite,
-          last_played: p.lastPlayed ?? null,
-        }))
-      )
-      if (error) throw new Error(`플레이리스트 업로드 실패: ${error.message}`)
+      // 클라우드에 이미 있는 URL 목록 조회
+      const { data: cloudPlaylists, error: fetchErr } = await supabase
+        .from('playlists')
+        .select('url')
+        .eq('user_id', userId)
+      if (fetchErr) throw new Error(`플레이리스트 조회 실패: ${fetchErr.message}`)
+
+      const cloudUrls = new Set((cloudPlaylists ?? []).map((p) => p.url))
+
+      // 클라우드에 없는 URL만 추가 (중복 방지 + 다른 기기 데이터 보존)
+      const newPlaylists = localPlaylists.filter((p) => !cloudUrls.has(p.url))
+
+      if (newPlaylists.length > 0) {
+        const { error } = await supabase.from('playlists').insert(
+          newPlaylists.map((p) => ({
+            id: p.id,
+            user_id: userId,
+            name: p.name,
+            url: p.url,
+            emoji: p.emoji,
+            is_favorite: p.isFavorite,
+            last_played: p.lastPlayed ?? null,
+          }))
+        )
+        if (error) throw new Error(`플레이리스트 업로드 실패: ${error.message}`)
+        uploadedPlaylists = newPlaylists.length
+      }
     }
 
     // ── 3. 설정 ────────────────────────────────────
@@ -84,8 +105,8 @@ export async function syncLocalToCloud(): Promise<SyncResult> {
     return {
       success: true,
       uploaded: {
-        todos: localTodos.length,
-        playlists: localPlaylists.length,
+        todos: uploadedTodos,
+        playlists: uploadedPlaylists,
       },
     }
   } catch (err) {
