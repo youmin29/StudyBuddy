@@ -126,6 +126,47 @@ function setupIpcHandlers() {
     return db.prepare('SELECT * FROM todos ORDER BY date, created_at').all()
   })
 
+  // ── Supabase 세션 영구 저장 (랜덤 포트 문제 우회) ──
+  const authFilePath = () => path.join(app.getPath('userData'), 'auth.json')
+
+  ipcMain.handle('auth:storage-get', (_event, key: string) => {
+    try {
+      const fp = authFilePath()
+      if (fs.existsSync(fp)) {
+        const data = JSON.parse(fs.readFileSync(fp, 'utf-8'))
+        return data[key] ?? null
+      }
+    } catch {}
+    return null
+  })
+
+  ipcMain.handle('auth:storage-set', (_event, key: string, value: string) => {
+    try {
+      const fp = authFilePath()
+      let data: Record<string, string> = {}
+      if (fs.existsSync(fp)) data = JSON.parse(fs.readFileSync(fp, 'utf-8'))
+      data[key] = value
+      fs.writeFileSync(fp, JSON.stringify(data), 'utf-8')
+      return { success: true }
+    } catch {
+      return { success: false }
+    }
+  })
+
+  ipcMain.handle('auth:storage-remove', (_event, key: string) => {
+    try {
+      const fp = authFilePath()
+      if (fs.existsSync(fp)) {
+        const data = JSON.parse(fs.readFileSync(fp, 'utf-8'))
+        delete data[key]
+        fs.writeFileSync(fp, JSON.stringify(data), 'utf-8')
+      }
+      return { success: true }
+    } catch {
+      return { success: false }
+    }
+  })
+
   ipcMain.handle('playlists:get', () => {
     const filePath = path.join(app.getPath('userData'), 'playlists.json')
     try {

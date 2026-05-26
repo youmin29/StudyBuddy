@@ -61,6 +61,11 @@ interface Window {
       get: () => Promise<Record<string, unknown>>
       set: (key: string, value: unknown) => Promise<{ success: boolean }>
     }
+    authStorage: {
+      get: (key: string) => Promise<string | null>
+      set: (key: string, value: string) => Promise<{ success: boolean }>
+      remove: (key: string) => Promise<{ success: boolean }>
+    }
   }
   ipcRenderer: import('electron').IpcRenderer
 }
