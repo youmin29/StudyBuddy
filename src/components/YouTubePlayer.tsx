@@ -340,7 +340,7 @@ export default function YouTubePlayer() {
               className="px-4 py-2.5 rounded-2xl text-white font-medium text-sm transition-all hover:opacity-90 active:scale-95"
               style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)' }}
             >
-              Load
+              재생
             </button>
           </div>
 
@@ -357,7 +357,7 @@ export default function YouTubePlayer() {
               >
                 <div className="flex items-center justify-center gap-2">
                   <Bookmark className="w-4 h-4 text-purple-600" />
-                  <span className="text-purple-700 font-medium">Save this playlist</span>
+                  <span className="text-purple-700 font-medium">재생목록 저장</span>
                 </div>
               </button>
             </div>
@@ -434,13 +434,13 @@ export default function YouTubePlayer() {
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(255,107,157,0.4)',
                   }}
                 >
-                  <span className="text-white font-medium">Save</span>
+                  <span className="text-white font-medium">저장</span>
                 </button>
                 <button
                   onClick={closeSaveDialog}
                   className="px-4 py-2 text-sm rounded-xl transition-all bg-white/60 hover:bg-white/80"
                 >
-                  <span className="text-purple-600">Cancel</span>
+                  <span className="text-purple-600">취소</span>
                 </button>
               </div>
             </div>
@@ -594,7 +594,7 @@ export default function YouTubePlayer() {
                     Playlist Library
                   </h3>
                 </div>
-                <p className="text-xs text-pink-400">저장된 재생목록</p>
+                <p className="text-xs text-pink-400">Saved playlists</p>
               </div>
 
               <div
@@ -606,7 +606,7 @@ export default function YouTubePlayer() {
                     <div className="flex items-center gap-2 mb-2.5">
                       <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-200 to-rose-200 px-2.5 py-1 rounded-full shadow-sm">
                         <Heart className="w-3 h-3 text-pink-600 fill-pink-600" />
-                        <span className="text-xs font-bold text-pink-700">Favorites</span>
+                        <span className="text-xs font-bold text-pink-700">즐겨찾기</span>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -661,7 +661,7 @@ export default function YouTubePlayer() {
                     <div className="flex items-center gap-2 mb-2.5">
                       <div className="bg-purple-100/60 px-2.5 py-1 rounded-full flex items-center gap-1.5">
                         <Clock className="w-3 h-3 text-purple-600" />
-                        <span className="text-xs font-medium text-purple-600">Recent</span>
+                        <span className="text-xs font-medium text-purple-600">최근</span>
                       </div>
                     </div>
                     <div className="space-y-1.5">

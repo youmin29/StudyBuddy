@@ -52,7 +52,7 @@ export default function ProfileMenu() {
           </p>
           <div className="flex items-center gap-1">
             <Cloud className="w-2.5 h-2.5 text-white/80" />
-            <p className="text-xs text-white/80 drop-shadow-sm">Synced</p>
+            <p className="text-xs text-white/80 drop-shadow-sm">동기화됨</p>
           </div>
         </div>
       </button>
@@ -102,7 +102,7 @@ export default function ProfileMenu() {
                 }}
               >
                 <Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
-                <p className="text-xs text-purple-600">Cloud Sync Enabled</p>
+                <p className="text-xs text-purple-600">클라우드 동기화 활성화</p>
               </div>
             </div>
 
@@ -129,7 +129,7 @@ export default function ProfileMenu() {
               }}
             >
               <p className="text-xs text-center text-purple-400">
-                All your data is safely synced ☁️
+                모든 데이터가 안전하게 동기화됐어요 ☁️
               </p>
             </div>
           </div>

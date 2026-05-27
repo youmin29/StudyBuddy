@@ -156,7 +156,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-purple-700 mb-1">Cloud Sync Benefits</p>
+                  <p className="text-sm font-medium text-purple-700 mb-1">클라우드 동기화 혜택</p>
                   <ul className="text-xs text-purple-600 space-y-0.5">
                     <li>✨ 여러 기기에서 할 일 · 플레이리스트 동기화</li>
                     <li>☁️ 자동 클라우드 백업</li>
@@ -301,7 +301,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
                   <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 ) : (
                   <span className="text-white font-medium drop-shadow-sm">
-                    {tab === 'login' ? 'Login & Sync' : '계정 만들기'}
+                    {tab === 'login' ? '로그인 & 동기화' : '계정 만들기'}
                   </span>
                 )}
               </button>
@@ -309,7 +309,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
                 onClick={handleClose}
                 className="px-5 py-3 rounded-2xl transition-all bg-white/60 hover:bg-white/80"
               >
-                <span className="text-purple-600 font-medium">Cancel</span>
+                <span className="text-purple-600 font-medium">취소</span>
               </button>
             </div>
           </div>

@@ -97,7 +97,7 @@ export default function Header() {
               </h1>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Sparkles className="w-3 h-3 text-yellow-300 drop-shadow-sm" />
-                <span className="text-xs text-white/90 drop-shadow-sm">Let's work together!</span>
+                <span className="text-xs text-white/90 drop-shadow-sm">같이 공부해요!</span>
               </div>
             </div>
           </div>
@@ -122,8 +122,8 @@ export default function Header() {
               >
                 <CloudOff className="w-4 h-4 text-white/90 drop-shadow-sm" />
                 <div className="text-left">
-                  <p className="text-xs font-medium text-white drop-shadow-sm">Guest Mode</p>
-                  <p className="text-xs text-white/80 drop-shadow-sm">Tap to login</p>
+                  <p className="text-xs font-medium text-white drop-shadow-sm">게스트 모드</p>
+                  <p className="text-xs text-white/80 drop-shadow-sm">탭하여 로그인</p>
                 </div>
               </button>
             )}

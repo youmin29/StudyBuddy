@@ -4,8 +4,7 @@ import {
   RotateCcw,
   Coffee,
   Brain,
-  Heart,
-  Sparkles,
+  BedDouble,
   Settings,
   X,
   Clock,
@@ -32,22 +31,22 @@ const getModeInfo = (mode: TimerMode) => {
     case "focus":
       return {
         icon: Brain,
-        label: "Focus Session",
+        label: "집중 세션",
         emoji: "💻",
         color: "#FF6B9D",
       };
     case "shortBreak":
       return {
         icon: Coffee,
-        label: "Short Break",
+        label: "짧은 휴식",
         emoji: "☕",
         color: "#A78BFA",
       };
     case "longBreak":
       return {
-        icon: Heart,
-        label: "Long Break",
-        emoji: "💖",
+        icon: BedDouble,
+        label: "긴 휴식",
+        emoji: "🛏️",
         color: "#60A5FA",
       };
   }
@@ -251,29 +250,23 @@ export default function PomodoroTimer() {
     return ((total - seconds) / total) * 100;
   };
 
-  const getNextMode = () => {
-    if (mode === "focus")
-      return sessionCountRef.current % 4 === 3 ? "Long Break" : "Short Break";
-    return "Focus Session";
-  };
-
   const getCompletionMessage = () => {
     if (mode === "focus")
       return {
-        title: "Great job focusing!",
+        title: "집중 완료!",
         emoji: "✨",
-        message: "Time for a well-deserved break!",
+        message: "잠깐 쉬어봐요!",
       };
     if (mode === "shortBreak")
       return {
-        title: "Break complete!",
+        title: "휴식 완료!",
         emoji: "💪",
-        message: "Let's get back to work!",
+        message: "다시 집중할 시간이에요!",
       };
     return {
-      title: "Nice long break!",
+      title: "긴 휴식 완료!",
       emoji: "🌟",
-      message: "Ready to focus again?",
+      message: "다시 집중할 준비됐나요?",
     };
   };
 
@@ -350,19 +343,19 @@ export default function PomodoroTimer() {
                   [
                     {
                       key: "focus",
-                      label: "💻 Focus",
+                      label: "💻 집중",
                       color: "#FF6B9D",
                       desc: "집중 세션 시간",
                     },
                     {
                       key: "shortBreak",
-                      label: "☕ Short Break",
+                      label: "☕ 짧은 휴식",
                       color: "#A78BFA",
                       desc: "짧은 휴식 시간",
                     },
                     {
                       key: "longBreak",
-                      label: "💖 Long Break",
+                      label: "💖 긴 휴식",
                       color: "#60A5FA",
                       desc: "긴 휴식 시간 (4세션마다)",
                     },
@@ -503,7 +496,7 @@ export default function PomodoroTimer() {
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-purple-700">Pomodoro Timer</p>
             <p className="text-xs text-purple-400">
-              {sessionCount} sessions today
+              {sessionCount}번 집중 완료
             </p>
           </div>
           <button
@@ -542,11 +535,7 @@ export default function PomodoroTimer() {
                 }
               >
                 {info.emoji}{" "}
-                {m === "focus"
-                  ? "Focus"
-                  : m === "shortBreak"
-                    ? "Break"
-                    : "Rest"}
+                {m === "focus" ? "집중" : m === "shortBreak" ? "휴식" : "쉬기"}
               </button>
             );
           })}
@@ -604,7 +593,7 @@ export default function PomodoroTimer() {
                 <Play className="w-3.5 h-3.5 text-white fill-white" />
               )}
               <span className="text-white font-medium text-xs">
-                {isActive ? "Pause" : "Start"}
+                {isActive ? "일시정지" : "시작"}
               </span>
             </div>
           </button>
@@ -651,21 +640,6 @@ export default function PomodoroTimer() {
           )}
         </div>
 
-        {/* Up next */}
-        <div
-          className="p-2.5 rounded-xl text-center mt-auto"
-          style={{
-            background: "rgba(255,255,255,0.5)",
-            border: "1px solid rgba(167,139,250,0.2)",
-          }}
-        >
-          <div className="flex items-center justify-center gap-1.5">
-            <Sparkles className="w-3 h-3 text-purple-400" />
-            <p className="text-xs text-purple-600">
-              Up next: <span className="font-medium">{getNextMode()}</span>
-            </p>
-          </div>
-        </div>
       </div>
     </>
   );
