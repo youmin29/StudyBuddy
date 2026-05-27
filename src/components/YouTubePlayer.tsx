@@ -12,10 +12,12 @@ import {
   Bookmark,
   Trash2,
   Music2,
+  Timer,
 } from 'lucide-react'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { useAuthStore } from '../store/useAuthStore'
 import { supabase } from '../lib/supabase'
+import PomodoroTimer from './PomodoroTimer'
 
 interface SavedPlaylist {
   id: string
@@ -36,6 +38,7 @@ export default function YouTubePlayer() {
   const [isShuffle, setIsShuffle] = useState(false)
   const [isRepeat, setIsRepeat] = useState(false)
   const isRepeatRef = useRef(false)
+  const [rightTab, setRightTab] = useState<'library' | 'timer'>('library')
 
   // user 변경 시(로그인·로그아웃)마다 플레이리스트 다시 로드
   useEffect(() => {
@@ -537,7 +540,7 @@ export default function YouTubePlayer() {
         </div>
       </div>
 
-      {/* Playlist Library – right 1 column */}
+      {/* Right Panel – Playlist Library / Pomodoro Timer */}
       <div
         className="col-span-1 rounded-3xl overflow-hidden"
         style={{
@@ -546,190 +549,179 @@ export default function YouTubePlayer() {
         }}
       >
         <div className="p-4 h-full flex flex-col">
-          {/* Library Header */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Music2 className="w-4 h-4 text-pink-500" />
-              <h3 className="font-bold text-pink-700" style={{ fontSize: '15px' }}>
-                Playlist Library
-              </h3>
-            </div>
-            <p className="text-xs text-pink-400">저장된 재생목록</p>
-          </div>
-
-          {/* Scrollable Playlist Area */}
+          {/* 탭 버튼 */}
           <div
-            className="flex-1 overflow-y-auto pr-1 space-y-4"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: '#F9A8D4 #FCE7F3' }}
+            className="flex gap-1.5 mb-4 p-1 rounded-2xl"
+            style={{ background: 'rgba(255,255,255,0.5)' }}
           >
-            {/* Favorites Section */}
-            {favoritePlaylists.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-200 to-rose-200 px-2.5 py-1 rounded-full shadow-sm">
-                    <Heart className="w-3 h-3 text-pink-600 fill-pink-600" />
-                    <span className="text-xs font-bold text-pink-700">Favorites</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {favoritePlaylists.map((playlist) => (
-                    <div key={playlist.id} className="relative group">
-                      <div
-                        className="absolute inset-0 rounded-xl blur-sm opacity-40"
-                        style={{
-                          background: 'linear-gradient(135deg, #FFB6D9 0%, #FFC9E5 100%)',
-                        }}
-                      />
-                      <button
-                        onClick={() => loadPlaylist(playlist)}
-                        className="relative w-full text-left rounded-xl p-3 border transition-all hover:scale-[1.02] active:scale-[0.98]"
-                        style={{
-                          background:
-                            currentPlaylist?.id === playlist.id
-                              ? 'linear-gradient(135deg, #FFF0F8 0%, #FFEBF4 100%)'
-                              : 'linear-gradient(to bottom, #ffffff, #fffbfe)',
-                          borderColor:
-                            currentPlaylist?.id === playlist.id
-                              ? '#FFB6D9'
-                              : 'rgba(255, 182, 217, 0.3)',
-                          boxShadow:
-                            currentPlaylist?.id === playlist.id
-                              ? 'inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 10px rgba(255,107,157,0.3)'
-                              : 'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.08)',
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl flex-shrink-0">{playlist.emoji}</span>
-                          <p className="flex-1 text-sm font-medium text-pink-700 truncate min-w-0">
-                            {playlist.name}
-                          </p>
-                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                toggleFavorite(playlist.id)
-                              }}
-                              className="p-1 rounded-lg hover:bg-pink-100 transition-all"
-                            >
-                              <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                deletePlaylist(playlist.id)
-                              }}
-                              className="p-1 rounded-lg hover:bg-red-100 transition-all"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                            </button>
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Divider between sections */}
-            {favoritePlaylists.length > 0 && recentPlaylists.length > 0 && (
-              <div className="flex items-center gap-2 py-1">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent" />
-                <div className="text-xs text-pink-300">✦</div>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent" />
-              </div>
-            )}
-
-            {/* Recent Section */}
-            {recentPlaylists.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <div className="bg-purple-100/60 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                    <Clock className="w-3 h-3 text-purple-600" />
-                    <span className="text-xs font-medium text-purple-600">Recent</span>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  {recentPlaylists.map((playlist) => (
-                    <button
-                      key={playlist.id}
-                      onClick={() => loadPlaylist(playlist)}
-                      className="w-full text-left rounded-lg px-3 py-2.5 border border-purple-100/50 transition-all hover:bg-white/80 hover:shadow-md active:scale-[0.98] group"
-                      style={{
-                        background:
-                          currentPlaylist?.id === playlist.id
-                            ? 'linear-gradient(135deg, #F8F0FF 0%, #FFF0F8 100%)'
-                            : 'rgba(255,255,255,0.5)',
-                        boxShadow:
-                          'inset 0 1px 0 rgba(255,255,255,0.7), 0 1px 2px rgba(0,0,0,0.05)',
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg flex-shrink-0">{playlist.emoji}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-purple-700 truncate">
-                            {playlist.name}
-                          </p>
-                          {playlist.lastPlayed && (
-                            <p className="text-xs text-purple-400 mt-0.5">
-                              {new Date(playlist.lastPlayed).toLocaleDateString('ko-KR', {
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleFavorite(playlist.id)
-                            }}
-                            className="p-1 rounded-md hover:bg-pink-100 transition-all"
-                          >
-                            <Heart
-                              className={`w-3 h-3 ${
-                                playlist.isFavorite
-                                  ? 'text-pink-500 fill-pink-500'
-                                  : 'text-purple-300'
-                              }`}
-                            />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              deletePlaylist(playlist.id)
-                            }}
-                            className="p-1 rounded-md hover:bg-red-100 transition-all"
-                          >
-                            <Trash2 className="w-3 h-3 text-red-400" />
-                          </button>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Empty State */}
-            {savedPlaylists.length === 0 && (
-              <div className="text-center py-6">
-                <div className="bg-white/50 backdrop-blur-sm p-5 rounded-2xl inline-block shadow-sm">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md"
-                    style={{ background: 'linear-gradient(135deg, #F9A8D4 0%, #C4B5FD 100%)' }}
-                  >
-                    <Music2 className="w-6 h-6 text-white" />
-                  </div>
-                  <p className="text-pink-600 text-xs font-medium mb-1">저장된 재생목록 없음</p>
-                  <p className="text-pink-400 text-xs">URL 입력 후 저장해보세요!</p>
-                </div>
-              </div>
-            )}
+            <button
+              onClick={() => setRightTab('library')}
+              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-medium transition-all"
+              style={rightTab === 'library' ? {
+                background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)',
+                color: 'white',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(255,107,157,0.35)',
+              } : {
+                color: '#9333EA',
+              }}
+            >
+              <Music2 className="w-3 h-3" />
+              Playlist
+            </button>
+            <button
+              onClick={() => setRightTab('timer')}
+              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-medium transition-all"
+              style={rightTab === 'timer' ? {
+                background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)',
+                color: 'white',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(167,139,250,0.35)',
+              } : {
+                color: '#9333EA',
+              }}
+            >
+              <Timer className="w-3 h-3" />
+              Timer
+            </button>
           </div>
+
+          {/* Playlist Library 탭 */}
+          {rightTab === 'library' && (
+            <>
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <Music2 className="w-4 h-4 text-pink-500" />
+                  <h3 className="font-bold text-pink-700" style={{ fontSize: '15px' }}>
+                    Playlist Library
+                  </h3>
+                </div>
+                <p className="text-xs text-pink-400">저장된 재생목록</p>
+              </div>
+
+              <div
+                className="flex-1 overflow-y-auto pr-1 space-y-4"
+                style={{ scrollbarWidth: 'thin', scrollbarColor: '#F9A8D4 #FCE7F3' }}
+              >
+                {favoritePlaylists.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-200 to-rose-200 px-2.5 py-1 rounded-full shadow-sm">
+                        <Heart className="w-3 h-3 text-pink-600 fill-pink-600" />
+                        <span className="text-xs font-bold text-pink-700">Favorites</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {favoritePlaylists.map((playlist) => (
+                        <div key={playlist.id} className="relative group">
+                          <div
+                            className="absolute inset-0 rounded-xl blur-sm opacity-40"
+                            style={{ background: 'linear-gradient(135deg, #FFB6D9 0%, #FFC9E5 100%)' }}
+                          />
+                          <button
+                            onClick={() => loadPlaylist(playlist)}
+                            className="relative w-full text-left rounded-xl p-3 border transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            style={{
+                              background: currentPlaylist?.id === playlist.id
+                                ? 'linear-gradient(135deg, #FFF0F8 0%, #FFEBF4 100%)'
+                                : 'linear-gradient(to bottom, #ffffff, #fffbfe)',
+                              borderColor: currentPlaylist?.id === playlist.id ? '#FFB6D9' : 'rgba(255,182,217,0.3)',
+                              boxShadow: currentPlaylist?.id === playlist.id
+                                ? 'inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 10px rgba(255,107,157,0.3)'
+                                : 'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.08)',
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-xl flex-shrink-0">{playlist.emoji}</span>
+                              <p className="flex-1 text-sm font-medium text-pink-700 truncate min-w-0">{playlist.name}</p>
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(playlist.id) }} className="p-1 rounded-lg hover:bg-pink-100 transition-all">
+                                  <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+                                </button>
+                                <button onClick={(e) => { e.stopPropagation(); deletePlaylist(playlist.id) }} className="p-1 rounded-lg hover:bg-red-100 transition-all">
+                                  <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                                </button>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {favoritePlaylists.length > 0 && recentPlaylists.length > 0 && (
+                  <div className="flex items-center gap-2 py-1">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent" />
+                    <div className="text-xs text-pink-300">✦</div>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent" />
+                  </div>
+                )}
+
+                {recentPlaylists.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <div className="bg-purple-100/60 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                        <Clock className="w-3 h-3 text-purple-600" />
+                        <span className="text-xs font-medium text-purple-600">Recent</span>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      {recentPlaylists.map((playlist) => (
+                        <button
+                          key={playlist.id}
+                          onClick={() => loadPlaylist(playlist)}
+                          className="w-full text-left rounded-lg px-3 py-2.5 border border-purple-100/50 transition-all hover:bg-white/80 hover:shadow-md active:scale-[0.98] group"
+                          style={{
+                            background: currentPlaylist?.id === playlist.id
+                              ? 'linear-gradient(135deg, #F8F0FF 0%, #FFF0F8 100%)'
+                              : 'rgba(255,255,255,0.5)',
+                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7), 0 1px 2px rgba(0,0,0,0.05)',
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg flex-shrink-0">{playlist.emoji}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-purple-700 truncate">{playlist.name}</p>
+                              {playlist.lastPlayed && (
+                                <p className="text-xs text-purple-400 mt-0.5">
+                                  {new Date(playlist.lastPlayed).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button onClick={(e) => { e.stopPropagation(); toggleFavorite(playlist.id) }} className="p-1 rounded-md hover:bg-pink-100 transition-all">
+                                <Heart className={`w-3 h-3 ${playlist.isFavorite ? 'text-pink-500 fill-pink-500' : 'text-purple-300'}`} />
+                              </button>
+                              <button onClick={(e) => { e.stopPropagation(); deletePlaylist(playlist.id) }} className="p-1 rounded-md hover:bg-red-100 transition-all">
+                                <Trash2 className="w-3 h-3 text-red-400" />
+                              </button>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {savedPlaylists.length === 0 && (
+                  <div className="text-center py-6">
+                    <div className="bg-white/50 backdrop-blur-sm p-5 rounded-2xl inline-block shadow-sm">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md"
+                        style={{ background: 'linear-gradient(135deg, #F9A8D4 0%, #C4B5FD 100%)' }}
+                      >
+                        <Music2 className="w-6 h-6 text-white" />
+                      </div>
+                      <p className="text-pink-600 text-xs font-medium mb-1">저장된 재생목록 없음</p>
+                      <p className="text-pink-400 text-xs">URL 입력 후 저장해보세요!</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Pomodoro Timer 탭 */}
+          {rightTab === 'timer' && <PomodoroTimer />}
         </div>
       </div>
     </div>
