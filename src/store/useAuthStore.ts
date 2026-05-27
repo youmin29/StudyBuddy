@@ -1,6 +1,8 @@
 import { create } from 'zustand'
-import type { User } from '@supabase/supabase-js'
+import type { User, RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+
+let playlistChannel: RealtimeChannel | null = null
 
 interface AuthStore {
   user: User | null
@@ -15,6 +17,8 @@ interface AuthStore {
   signOut: () => Promise<void>
   loadUser: () => Promise<void>
   updateNickname: (nickname: string) => Promise<string | null>
+  subscribeToPlaylists: (userId: string) => void
+  unsubscribeFromPlaylists: () => void
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -60,5 +64,32 @@ export const useAuthStore = create<AuthStore>((set) => ({
     if (error) return error.message
     set({ user: data.user })
     return null
+  },
+
+  // ─── Playlists Realtime 구독 ─────────────────────────
+  subscribeToPlaylists: (userId: string) => {
+    if (playlistChannel) {
+      supabase.removeChannel(playlistChannel)
+      playlistChannel = null
+    }
+
+    playlistChannel = supabase
+      .channel(`playlists-${userId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'playlists', filter: `user_id=eq.${userId}` },
+        () => {
+          // 변경이 감지되면 YouTubePlayer가 목록을 다시 불러오도록 트리거
+          set((s) => ({ syncVersion: s.syncVersion + 1 }))
+        }
+      )
+      .subscribe()
+  },
+
+  unsubscribeFromPlaylists: () => {
+    if (playlistChannel) {
+      supabase.removeChannel(playlistChannel)
+      playlistChannel = null
+    }
   },
 }))

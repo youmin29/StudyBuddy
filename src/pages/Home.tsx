@@ -7,6 +7,10 @@ import { useTodoStore } from '../store/useTodoStore'
 import { useAuthStore } from '../store/useAuthStore'
 import { useThemeStore } from '../store/useThemeStore'
 
+// 스토어 getState를 직접 참조 (useEffect 외부에서도 안전하게 사용)
+const { subscribeToRealtime, unsubscribeFromRealtime } = useTodoStore.getState()
+const { subscribeToPlaylists, unsubscribeFromPlaylists } = useAuthStore.getState()
+
 export default function Home() {
   const { user, loading } = useAuthStore()
   const { setSelectedDate, loadTodoCounts, loadSettings } = useTodoStore()
@@ -17,13 +21,23 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 로그인 상태가 바뀔 때마다 (로그인·로그아웃·초기 로드) 데이터 새로 로드
-  // loading이 false가 된 후부터 user 변화를 감지
+  // 로그인 상태가 바뀔 때마다 (로그인·로그아웃·초기 로드) 데이터 새로 로드 + Realtime 구독 설정
   useEffect(() => {
     if (loading) return
+
     loadTodoCounts()
     loadSettings()
     setSelectedDate(new Date())
+
+    if (user) {
+      // 로그인 → Realtime 구독 시작
+      subscribeToRealtime(user.id)
+      subscribeToPlaylists(user.id)
+    } else {
+      // 로그아웃 → 구독 해제
+      unsubscribeFromRealtime()
+      unsubscribeFromPlaylists()
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading])
 

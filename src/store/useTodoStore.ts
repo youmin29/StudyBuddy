@@ -1,5 +1,9 @@
 import { create } from 'zustand'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+
+// 스토어 외부에 채널 참조 보관 (Zustand state에 넣으면 직렬화 문제)
+let todoChannel: RealtimeChannel | null = null
 
 export interface Todo {
   id: string
@@ -36,6 +40,8 @@ interface TodoStore {
   toggleTodo: (id: string) => Promise<void>
   toggleImportant: (id: string) => Promise<void>
   deleteTodo: (id: string) => Promise<void>
+  subscribeToRealtime: (userId: string) => void
+  unsubscribeFromRealtime: () => void
 }
 
 export const useTodoStore = create<TodoStore>((set, get) => ({
@@ -288,5 +294,63 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
       // silently fail
     }
     await loadTodoCounts()
+  },
+
+  // ─── Realtime 구독 ────────────────────────────────────
+  subscribeToRealtime: (userId: string) => {
+    // 기존 구독 정리
+    if (todoChannel) {
+      supabase.removeChannel(todoChannel)
+      todoChannel = null
+    }
+
+    todoChannel = supabase
+      .channel(`todos-${userId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'todos', filter: `user_id=eq.${userId}` },
+        (payload) => {
+          const { selectedDate, todos, loadTodoCounts } = get()
+          const dateStr = toDateStr(selectedDate)
+
+          if (payload.eventType === 'INSERT') {
+            const incoming: Todo = {
+              id: payload.new.id,
+              text: payload.new.text,
+              completed: Boolean(payload.new.completed),
+              important: Boolean(payload.new.important),
+              date: payload.new.date,
+            }
+            // 현재 날짜의 todo이고, 이미 로컬에 없을 때만 추가 (자기 자신 에코 방지)
+            if (incoming.date === dateStr && !todos.find((t) => t.id === incoming.id)) {
+              set({ todos: [...todos, incoming] })
+            }
+            loadTodoCounts()
+          } else if (payload.eventType === 'UPDATE') {
+            const updated: Todo = {
+              id: payload.new.id,
+              text: payload.new.text,
+              completed: Boolean(payload.new.completed),
+              important: Boolean(payload.new.important),
+              date: payload.new.date,
+            }
+            if (updated.date === dateStr) {
+              set({ todos: todos.map((t) => (t.id === updated.id ? updated : t)) })
+            }
+            loadTodoCounts()
+          } else if (payload.eventType === 'DELETE') {
+            set({ todos: todos.filter((t) => t.id !== payload.old.id) })
+            loadTodoCounts()
+          }
+        }
+      )
+      .subscribe()
+  },
+
+  unsubscribeFromRealtime: () => {
+    if (todoChannel) {
+      supabase.removeChannel(todoChannel)
+      todoChannel = null
+    }
   },
 }))
