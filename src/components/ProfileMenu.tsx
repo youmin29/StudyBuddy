@@ -1,16 +1,25 @@
-import { Cloud, LogOut, User, Check } from 'lucide-react'
+import { Cloud, LogOut, User, Check, Pencil, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 
 export default function ProfileMenu() {
-  const { user, signOut } = useAuthStore()
+  const { user, signOut, updateNickname } = useAuthStore()
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 })
   const buttonRef = useRef<HTMLButtonElement>(null)
 
+  // 닉네임 편집 상태
+  const [isEditingNick, setIsEditingNick] = useState(false)
+  const [nickDraft, setNickDraft] = useState('')
+  const [nickError, setNickError] = useState('')
+  const [nickSaving, setNickSaving] = useState(false)
+  const nickInputRef = useRef<HTMLInputElement>(null)
+
   if (!user) return null
 
-  const displayName = user.email?.split('@')[0] ?? 'User'
+  const nickname = (user.user_metadata?.nickname as string | undefined)?.trim()
+  const emailName = user.email?.split('@')[0] ?? 'User'
+  const displayName = nickname || emailName
 
   const handleToggle = () => {
     if (!isOpen && buttonRef.current) {
@@ -21,6 +30,37 @@ export default function ProfileMenu() {
       })
     }
     setIsOpen(!isOpen)
+    setIsEditingNick(false)
+    setNickError('')
+  }
+
+  const startEdit = () => {
+    setNickDraft(nickname ?? emailName)
+    setNickError('')
+    setIsEditingNick(true)
+    setTimeout(() => nickInputRef.current?.focus(), 50)
+  }
+
+  const cancelEdit = () => {
+    setIsEditingNick(false)
+    setNickError('')
+  }
+
+  const saveNick = async () => {
+    const trimmed = nickDraft.trim()
+    if (!trimmed) { setNickError('닉네임을 입력해주세요'); return }
+    if (trimmed.length > 20) { setNickError('20자 이내로 입력해주세요'); return }
+    setNickSaving(true)
+    const err = await updateNickname(trimmed)
+    setNickSaving(false)
+    if (err) { setNickError(err); return }
+    setIsEditingNick(false)
+    setNickError('')
+  }
+
+  const handleNickKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') saveNick()
+    if (e.key === 'Escape') cancelEdit()
   }
 
   return (
@@ -57,7 +97,7 @@ export default function ProfileMenu() {
         </div>
       </button>
 
-      {/* Dropdown — fixed 포지션으로 overflow:hidden 탈출 */}
+      {/* Dropdown */}
       {isOpen && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
@@ -69,7 +109,7 @@ export default function ProfileMenu() {
               background: 'linear-gradient(135deg, #FFF0F8 0%, #F8F0FF 100%)',
               boxShadow: '0 12px 40px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.8)',
               border: '2px solid rgba(255,182,217,0.4)',
-              width: '240px',
+              width: '260px',
             }}
           >
             {/* User Info */}
@@ -89,16 +129,60 @@ export default function ProfileMenu() {
                 >
                   <User className="w-5 h-5 text-white" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-purple-700 truncate">{displayName}</p>
+                <div className="min-w-0 flex-1">
+                  {/* 닉네임 표시 / 편집 */}
+                  {isEditingNick ? (
+                    <div>
+                      <div className="flex items-center gap-1 mb-1">
+                        <input
+                          ref={nickInputRef}
+                          type="text"
+                          value={nickDraft}
+                          onChange={(e) => setNickDraft(e.target.value)}
+                          onKeyDown={handleNickKeyDown}
+                          maxLength={20}
+                          className="flex-1 min-w-0 px-2 py-1 text-sm rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-purple-700 font-bold"
+                          style={{ background: 'white' }}
+                        />
+                        <button
+                          onClick={saveNick}
+                          disabled={nickSaving}
+                          className="p-1 rounded-lg hover:bg-green-100 transition-all flex-shrink-0"
+                          title="저장"
+                        >
+                          <Check className="w-3.5 h-3.5 text-green-600" />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-1 rounded-lg hover:bg-red-100 transition-all flex-shrink-0"
+                          title="취소"
+                        >
+                          <X className="w-3.5 h-3.5 text-red-400" />
+                        </button>
+                      </div>
+                      {nickError && (
+                        <p className="text-xs text-red-500">{nickError}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 group/nick">
+                      <p className="text-sm font-bold text-purple-700 truncate">{displayName}</p>
+                      <button
+                        onClick={startEdit}
+                        className="p-0.5 rounded opacity-0 group-hover/nick:opacity-100 hover:bg-purple-100 transition-all flex-shrink-0"
+                        title="닉네임 변경"
+                      >
+                        <Pencil className="w-3 h-3 text-purple-400" />
+                      </button>
+                    </div>
+                  )}
                   <p className="text-xs text-purple-400 truncate">{user.email}</p>
                 </div>
               </div>
               <div
                 className="flex items-center gap-2 px-3 py-2 rounded-lg"
                 style={{
-                  background:
-                    'linear-gradient(to right, rgba(168,216,240,0.2), rgba(167,139,250,0.2))',
+                  background: 'linear-gradient(to right, rgba(168,216,240,0.2), rgba(167,139,250,0.2))',
                 }}
               >
                 <Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
@@ -109,10 +193,7 @@ export default function ProfileMenu() {
             {/* Menu Items */}
             <div className="py-2">
               <button
-                onClick={() => {
-                  signOut()
-                  setIsOpen(false)
-                }}
+                onClick={() => { signOut(); setIsOpen(false) }}
                 className="w-full px-4 py-2.5 flex items-center gap-3 transition-all hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4 text-red-500" />
@@ -124,8 +205,7 @@ export default function ProfileMenu() {
             <div
               className="px-4 py-3 border-t border-pink-200/50"
               style={{
-                background:
-                  'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.5))',
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.5))',
               }}
             >
               <p className="text-xs text-center text-purple-400">

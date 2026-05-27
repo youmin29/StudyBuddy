@@ -14,6 +14,7 @@ interface AuthStore {
   ) => Promise<{ error: string | null; needsConfirmation: boolean }>
   signOut: () => Promise<void>
   loadUser: () => Promise<void>
+  updateNickname: (nickname: string) => Promise<string | null>
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -50,5 +51,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
   signOut: async () => {
     await supabase.auth.signOut()
     set({ user: null })
+  },
+
+  updateNickname: async (nickname: string) => {
+    const { data, error } = await supabase.auth.updateUser({
+      data: { nickname: nickname.trim() },
+    })
+    if (error) return error.message
+    set({ user: data.user })
+    return null
   },
 }))
