@@ -20,17 +20,17 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(221, 214, 254, 0.3);
+  background: var(--t-scroll-track, rgba(221, 214, 254, 0.3));
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(196, 181, 253, 0.6);
+  background: var(--t-scroll, rgba(196, 181, 253, 0.6));
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.8);
+  background: var(--t-c2, rgba(167, 139, 250, 0.8));
 }
 
 /* Range input */
@@ -49,7 +49,7 @@ input[type='range']::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #A78BFA;
+  background: var(--t-c2, #A78BFA);
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);

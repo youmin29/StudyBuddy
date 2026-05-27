@@ -47,27 +47,27 @@ export default function MiniCalendar() {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => setViewMonth(new Date(year, month - 1))}
-            className="p-1.5 rounded-lg hover:bg-pink-100 transition-all"
-            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+            className="p-1.5 rounded-lg transition-all"
+            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)', background: 'color-mix(in srgb, var(--t-c1) 10%, transparent)' }}
           >
-            <ChevronLeft className="w-4 h-4 text-pink-500" />
+            <ChevronLeft className="w-4 h-4" style={{ color: 'var(--t-c1)' }} />
           </button>
-          <span className="font-bold text-pink-600" style={{ fontSize: '15px' }}>
+          <span className="font-bold" style={{ fontSize: '15px', color: 'var(--t-text)' }}>
             {viewMonth.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
           </span>
           <button
             onClick={() => setViewMonth(new Date(year, month + 1))}
-            className="p-1.5 rounded-lg hover:bg-pink-100 transition-all"
-            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+            className="p-1.5 rounded-lg transition-all"
+            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)', background: 'color-mix(in srgb, var(--t-c1) 10%, transparent)' }}
           >
-            <ChevronRight className="w-4 h-4 text-pink-500" />
+            <ChevronRight className="w-4 h-4" style={{ color: 'var(--t-c1)' }} />
           </button>
         </div>
 
         {/* Day Headers */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {DAY_LABELS.map((d) => (
-            <div key={d} className="text-center text-xs font-medium text-pink-400 py-1">
+            <div key={d} className="text-center text-xs font-medium py-1" style={{ color: 'var(--t-text-light)' }}>
               {d}
             </div>
           ))}
@@ -103,23 +103,21 @@ export default function MiniCalendar() {
                 className="h-8 w-full rounded-lg transition-all relative group flex flex-col items-center justify-center"
                 style={{
                   background: selected
-                    ? 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)'
+                    ? 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)'
                     : today
-                    ? 'linear-gradient(135deg, #FFE5F0 0%, #E5D5FF 100%)'
+                    ? 'linear-gradient(135deg, var(--t-scroll-track) 0%, var(--t-c2-soft) 100%)'
                     : 'transparent',
                   boxShadow: selected
-                    ? 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(255,107,157,0.4)'
+                    ? 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px var(--t-c1-glow)'
                     : undefined,
                 }}
               >
                 <span
-                  className={`text-xs font-medium leading-none ${
-                    selected
-                      ? 'text-white font-bold'
-                      : today
-                      ? 'text-pink-600 font-bold'
-                      : 'text-pink-700'
-                  }`}
+                  className="text-xs font-medium leading-none"
+                  style={{
+                    color: selected ? 'white' : today ? 'var(--t-text-soft)' : 'var(--t-text)',
+                    fontWeight: selected || today ? 700 : 500,
+                  }}
                 >
                   {day}
                 </span>
@@ -128,19 +126,22 @@ export default function MiniCalendar() {
                     {hasImportant && (
                       <Star
                         className="w-2 h-2"
-                        style={{ color: selected ? 'white' : '#EC4899', fill: selected ? 'white' : '#EC4899' }}
+                        style={{ color: selected ? 'white' : 'var(--t-c1)', fill: selected ? 'white' : 'var(--t-c1)' }}
                       />
                     )}
                     {hasRegular && (
                       <div
                         className="w-1 h-1 rounded-full"
-                        style={{ background: selected ? 'white' : 'linear-gradient(135deg, #FF6B9D, #C239B3)' }}
+                        style={{ background: selected ? 'white' : 'linear-gradient(135deg, var(--t-c1), var(--t-c1b))' }}
                       />
                     )}
                   </div>
                 )}
                 {!selected && (
-                  <div className="absolute inset-0 bg-pink-200/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div
+                    className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: 'color-mix(in srgb, var(--t-c1) 15%, transparent)' }}
+                  />
                 )}
               </button>
             )
@@ -148,8 +149,8 @@ export default function MiniCalendar() {
         </div>
 
         {/* Selected Date Label */}
-        <div className="mt-2 pt-2 border-t border-pink-200">
-          <p className="text-xs text-center text-pink-400">
+        <div className="mt-2 pt-2 border-t border-pink-200/60">
+          <p className="text-xs text-center" style={{ color: 'var(--t-text-light)' }}>
             {selectedDate.toLocaleDateString('ko-KR', {
               month: 'long',
               day: 'numeric',

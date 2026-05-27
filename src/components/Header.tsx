@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Heart, Music, Sparkles, CloudOff } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useTodoStore } from '../store/useTodoStore'
+import { useThemeStore } from '../store/useThemeStore'
 import { syncLocalToCloud } from '../lib/sync'
 import AuthModal from './AuthModal'
 import ProfileMenu from './ProfileMenu'
@@ -10,6 +11,7 @@ import SyncModal from './SyncModal'
 export default function Header() {
   const { user, loadUser, bumpSync } = useAuthStore()
   const { loadTodoCounts, loadSettings, setSelectedDate } = useTodoStore()
+  const { theme } = useThemeStore()
   const [now, setNow] = useState(new Date())
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showSyncModal, setShowSyncModal] = useState(false)
@@ -68,9 +70,10 @@ export default function Header() {
       <div
         className="relative overflow-hidden rounded-t-[28px] select-none"
         style={{
-          background: 'linear-gradient(135deg, #FFB6D9 0%, #D4A5F5 50%, #A8D8F0 100%)',
+          background: theme.headerBg,
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 8px rgba(0,0,0,0.1)',
           WebkitAppRegion: 'drag',
+          transition: 'background 0.4s ease',
         } as React.CSSProperties}
       >
         <div className="flex items-center justify-between px-6 py-4" style={{ paddingLeft: '80px' }}>
@@ -85,7 +88,7 @@ export default function Header() {
                 className="relative bg-white/80 backdrop-blur-sm p-2.5 rounded-2xl shadow-lg"
                 style={{ boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 2px 6px rgba(0,0,0,0.15)' }}
               >
-                <Music className="w-6 h-6 text-pink-500" strokeWidth={2.5} />
+                <Music className="w-6 h-6" style={{ color: 'var(--t-c1)' }} strokeWidth={2.5} />
               </div>
             </div>
             <div>

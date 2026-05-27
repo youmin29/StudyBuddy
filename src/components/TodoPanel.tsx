@@ -52,19 +52,19 @@ export default function TodoPanel() {
           <div className="mb-4 flex items-start justify-between">
             <div>
               <h3
-                className="font-bold text-purple-700"
-                style={{ fontSize: "16px" }}
+                className="font-bold"
+                style={{ fontSize: "16px", color: 'var(--t-text)' }}
               >
                 Daily Tasks
               </h3>
-              <p className="text-xs text-purple-400 mt-0.5">{dateLabel}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--t-text-light)' }}>{dateLabel}</p>
             </div>
             <button
               onClick={() => setShowSettings(true)}
-              className="p-2 rounded-xl transition-all hover:bg-purple-100/60"
-              style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+              className="p-2 rounded-xl transition-all"
+              style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)', background: 'color-mix(in srgb, var(--t-c2) 12%, transparent)' }}
             >
-              <Settings className="w-4 h-4 text-purple-500" />
+              <Settings className="w-4 h-4" style={{ color: 'var(--t-text-light)' }} />
             </button>
           </div>
 
@@ -76,8 +76,10 @@ export default function TodoPanel() {
               value={newText}
               onChange={(e) => setNewText(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 px-3 py-2 text-sm rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none transition-all text-purple-800 placeholder-purple-300"
+              className="flex-1 px-3 py-2 text-sm rounded-xl border-2 focus:outline-none transition-all"
               style={{
+                borderColor: 'color-mix(in srgb, var(--t-c2) 40%, transparent)',
+                color: 'var(--t-text)',
                 background: "linear-gradient(to bottom, #ffffff, #fefbff)",
                 boxShadow: "inset 0 1px 3px rgba(0,0,0,0.08)",
               }}
@@ -86,9 +88,9 @@ export default function TodoPanel() {
               onClick={handleAdd}
               className="px-3 py-2 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md"
               style={{
-                background: "linear-gradient(135deg, #A78BFA 0%, #C084FC 100%)",
+                background: "linear-gradient(135deg, var(--t-c2) 0%, var(--t-c2b) 100%)",
                 boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(167,139,250,0.4)",
+                  "inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px var(--t-c2-glow)",
               }}
             >
               <Plus className="w-4 h-4 text-white" />
@@ -101,11 +103,11 @@ export default function TodoPanel() {
             style={{
               maxHeight: "240px",
               scrollbarWidth: "thin",
-              scrollbarColor: "#D8B4FE #F3E8FF",
+              scrollbarColor: "var(--t-scroll) var(--t-scroll-track)",
             }}
           >
             {isLoading ? (
-              <div className="text-center py-8 text-purple-400 text-sm">
+              <div className="text-center py-8 text-sm" style={{ color: 'var(--t-text-light)' }}>
                 불러오는 중...
               </div>
             ) : todos.length === 0 ? (
@@ -115,15 +117,15 @@ export default function TodoPanel() {
                     className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
                     style={{
                       background:
-                        "linear-gradient(135deg, #C4B5FD 0%, #F9A8D4 100%)",
+                        "linear-gradient(135deg, var(--t-c2-soft) 0%, var(--t-scroll) 100%)",
                     }}
                   >
                     <span className="text-3xl">✨</span>
                   </div>
-                  <p className="text-purple-600 text-sm font-medium">
+                  <p className="text-sm font-medium" style={{ color: 'var(--t-text-soft)' }}>
                     할 일이 없어요!
                   </p>
-                  <p className="text-purple-400 text-xs mt-1">
+                  <p className="text-xs mt-1" style={{ color: 'var(--t-text-light)' }}>
                     위에서 첫 할 일을 추가해보세요
                   </p>
                 </div>
@@ -135,8 +137,8 @@ export default function TodoPanel() {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-200 to-purple-200 px-3 py-1.5 rounded-full shadow-sm">
-                        <Star className="w-3.5 h-3.5 text-pink-600 fill-pink-600" />
-                        <span className="text-xs font-bold text-pink-700">
+                        <Star className="w-3.5 h-3.5" style={{ color: 'var(--t-c1)', fill: 'var(--t-c1)' }} />
+                        <span className="text-xs font-bold" style={{ color: 'var(--t-text)' }}>
                           Important Tasks
                         </span>
                         <Sparkles className="w-3 h-3 text-yellow-500 fill-yellow-400" />
@@ -179,10 +181,10 @@ export default function TodoPanel() {
                                   className="w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center"
                                   style={{
                                     borderColor: todo.completed
-                                      ? "#EC4899"
-                                      : "#F9A8D4",
+                                      ? "var(--t-c1b)"
+                                      : "var(--t-scroll)",
                                     background: todo.completed
-                                      ? "linear-gradient(135deg, #FF6B9D 0%, #EC4899 100%)"
+                                      ? "linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)"
                                       : "white",
                                     boxShadow: todo.completed
                                       ? "inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(236,72,153,0.5)"
@@ -206,11 +208,11 @@ export default function TodoPanel() {
                               </button>
 
                               <p
-                                className={`flex-1 text-sm font-medium break-words min-w-0 mt-0.5 ${
-                                  todo.completed
-                                    ? "line-through text-pink-400"
-                                    : "text-pink-700"
-                                }`}
+                                className="flex-1 text-sm font-medium break-words min-w-0 mt-0.5"
+                                style={{
+                                  textDecoration: todo.completed ? 'line-through' : 'none',
+                                  color: todo.completed ? 'var(--t-text-light)' : 'var(--t-text)',
+                                }}
                               >
                                 {todo.text}
                               </p>
@@ -225,7 +227,7 @@ export default function TodoPanel() {
                                   }}
                                   title="중요 해제"
                                 >
-                                  <Star className="w-4 h-4 text-pink-500 fill-pink-500" />
+                                  <Star className="w-4 h-4" style={{ color: 'var(--t-c1)', fill: 'var(--t-c1)' }} />
                                 </button>
                                 <button
                                   onClick={() => deleteTodo(todo.id)}
@@ -245,7 +247,7 @@ export default function TodoPanel() {
                     {regularTodos.length > 0 && (
                       <div className="flex items-center gap-2 my-3">
                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent" />
-                        <div className="text-xs text-purple-300">♡</div>
+                        <div className="text-xs" style={{ color: 'var(--t-text-light)' }}>♡</div>
                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent" />
                       </div>
                     )}
@@ -257,8 +259,8 @@ export default function TodoPanel() {
                   <div>
                     {importantTodos.length > 0 && (
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="bg-purple-100/60 px-3 py-1.5 rounded-full">
-                          <span className="text-xs font-medium text-purple-600">
+                        <div className="px-3 py-1.5 rounded-full" style={{ background: 'color-mix(in srgb, var(--t-c2) 15%, transparent)' }}>
+                          <span className="text-xs font-medium" style={{ color: 'var(--t-text-soft)' }}>
                             Regular Tasks
                           </span>
                         </div>
@@ -284,10 +286,10 @@ export default function TodoPanel() {
                                 className="w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center"
                                 style={{
                                   borderColor: todo.completed
-                                    ? "#C084FC"
-                                    : "#D8B4FE",
+                                    ? "var(--t-c2b)"
+                                    : "var(--t-scroll)",
                                   background: todo.completed
-                                    ? "linear-gradient(135deg, #A78BFA 0%, #C084FC 100%)"
+                                    ? "linear-gradient(135deg, var(--t-c2) 0%, var(--t-c2b) 100%)"
                                     : "white",
                                   boxShadow: todo.completed
                                     ? "inset 0 1px 0 rgba(255,255,255,0.4)"
@@ -311,11 +313,11 @@ export default function TodoPanel() {
                             </button>
 
                             <p
-                              className={`flex-1 text-sm break-words min-w-0 ${
-                                todo.completed
-                                  ? "line-through text-purple-400"
-                                  : "text-purple-700"
-                              }`}
+                              className="flex-1 text-sm break-words min-w-0"
+                              style={{
+                                textDecoration: todo.completed ? 'line-through' : 'none',
+                                color: todo.completed ? 'var(--t-text-light)' : 'var(--t-text)',
+                              }}
                             >
                               {todo.text}
                             </p>
@@ -323,10 +325,11 @@ export default function TodoPanel() {
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                               <button
                                 onClick={() => toggleImportant(todo.id)}
-                                className="p-1 rounded-lg hover:bg-pink-100 transition-all"
+                                className="p-1 rounded-lg transition-all"
+                                style={{ background: 'color-mix(in srgb, var(--t-c1) 10%, transparent)' }}
                                 title="중요 표시"
                               >
-                                <Star className="w-4 h-4 text-purple-300" />
+                                <Star className="w-4 h-4" style={{ color: 'var(--t-text-light)' }} />
                               </button>
                               <button
                                 onClick={() => deleteTodo(todo.id)}
@@ -348,22 +351,22 @@ export default function TodoPanel() {
 
           {/* Stats */}
           {todos.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-purple-200">
+            <div className="mt-4 pt-3 border-t" style={{ borderColor: 'color-mix(in srgb, var(--t-c2) 25%, transparent)' }}>
               <div className="flex justify-between text-xs">
-                <span className="text-purple-500">
+                <span style={{ color: 'var(--t-text-soft)' }}>
                   {completedCount} / {todos.length} 완료
                 </span>
-                <span className="text-pink-500">
+                <span style={{ color: 'var(--t-c1)' }}>
                   {importantTodos.length}개 중요
                 </span>
               </div>
-              <div className="mt-2 h-1.5 bg-purple-100 rounded-full overflow-hidden">
+              <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: 'color-mix(in srgb, var(--t-c2) 20%, transparent)' }}>
                 <div
                   className="h-full rounded-full transition-all duration-300"
                   style={{
                     width: `${todos.length > 0 ? (completedCount / todos.length) * 100 : 0}%`,
                     background:
-                      "linear-gradient(90deg, #A78BFA 0%, #C084FC 100%)",
+                      "linear-gradient(90deg, var(--t-c2) 0%, var(--t-c2b) 100%)",
                   }}
                 />
               </div>
@@ -398,7 +401,7 @@ export default function TodoPanel() {
                 className="relative overflow-hidden px-6 py-4"
                 style={{
                   background:
-                    "linear-gradient(135deg, #FFB6D9 0%, #D4A5F5 100%)",
+                    "linear-gradient(135deg, var(--t-c1) 0%, var(--t-c2) 100%)",
                   boxShadow:
                     "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.1)",
                 }}
@@ -412,7 +415,7 @@ export default function TodoPanel() {
                           "inset 0 1px 2px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.2)",
                       }}
                     >
-                      <Sparkles className="w-4 h-4 text-pink-500" />
+                      <Sparkles className="w-4 h-4" style={{ color: 'var(--t-c1)' }} />
                     </div>
                     <h3
                       className="text-white font-bold drop-shadow-md"
@@ -459,10 +462,10 @@ export default function TodoPanel() {
                         className="w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center"
                         style={{
                           borderColor: hideCompletedFromCalendar
-                            ? "#EC4899"
-                            : "#F9A8D4",
+                            ? "var(--t-c1b)"
+                            : "var(--t-scroll)",
                           background: hideCompletedFromCalendar
-                            ? "linear-gradient(135deg, #FF6B9D 0%, #EC4899 100%)"
+                            ? "linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)"
                             : "white",
                           boxShadow: hideCompletedFromCalendar
                             ? "inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(236,72,153,0.5)"
@@ -488,7 +491,8 @@ export default function TodoPanel() {
                     {/* Label & Description */}
                     <div className="flex-1">
                       <label
-                        className="text-sm font-medium text-purple-700 cursor-pointer block mb-1"
+                        className="text-sm font-medium cursor-pointer block mb-1"
+                        style={{ color: 'var(--t-text)' }}
                         onClick={() =>
                           setHideCompletedFromCalendar(
                             !hideCompletedFromCalendar,
@@ -497,7 +501,7 @@ export default function TodoPanel() {
                       >
                         완료된 할 일을 캘린더에서 숨기기
                       </label>
-                      <p className="text-xs text-purple-500 leading-relaxed">
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--t-text-soft)' }}>
                         활성화하면, 모든 할 일이 완료된 날짜에는 캘린더 표시가
                         사라져요.
                       </p>
@@ -507,7 +511,7 @@ export default function TodoPanel() {
 
                 {/* Coming soon */}
                 <div className="mt-4 text-center">
-                  <p className="text-xs text-pink-400">
+                  <p className="text-xs" style={{ color: 'var(--t-text-light)' }}>
                     더 많은 설정이 곧 추가될 예정이에요! ✨
                   </p>
                 </div>
@@ -526,7 +530,7 @@ export default function TodoPanel() {
                   className="w-full px-4 py-2.5 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                   style={{
                     background:
-                      "linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)",
+                      "linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)",
                     boxShadow:
                       "inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 12px rgba(255,107,157,0.4)",
                   }}

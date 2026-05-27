@@ -1,9 +1,11 @@
-import { Cloud, LogOut, User, Check, Pencil, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Cloud, LogOut, User, Check, Pencil, X, Palette, ChevronDown } from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
+import { useThemeStore, THEMES } from '../store/useThemeStore'
 
 export default function ProfileMenu() {
   const { user, signOut, updateNickname } = useAuthStore()
+  const { theme: currentTheme, setTheme } = useThemeStore()
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 })
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -15,6 +17,14 @@ export default function ProfileMenu() {
   const [nickSaving, setNickSaving] = useState(false)
   const nickInputRef = useRef<HTMLInputElement>(null)
 
+  // 테마 아코디언
+  const [showThemeMenu, setShowThemeMenu] = useState(false)
+
+  // 드롭다운 닫히면 서브메뉴도 닫기
+  useEffect(() => {
+    if (!isOpen) setShowThemeMenu(false)
+  }, [isOpen])
+
   if (!user) return null
 
   const nickname = (user.user_metadata?.nickname as string | undefined)?.trim()
@@ -25,7 +35,7 @@ export default function ProfileMenu() {
     if (!isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
       setDropdownPos({
-        top: rect.bottom + 8,
+        top: rect.bottom + 2,
         right: window.innerWidth - rect.right,
       })
     }
@@ -80,7 +90,7 @@ export default function ProfileMenu() {
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
           style={{
-            background: 'linear-gradient(135deg, #A8D8F0 0%, #A78BFA 100%)',
+            background: 'linear-gradient(135deg, var(--t-avatar-a) 0%, var(--t-avatar-b) 100%)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2)',
           }}
         >
@@ -123,14 +133,13 @@ export default function ProfileMenu() {
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: 'linear-gradient(135deg, #A8D8F0 0%, #A78BFA 100%)',
+                    background: 'linear-gradient(135deg, var(--t-avatar-a) 0%, var(--t-avatar-b) 100%)',
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(0,0,0,0.2)',
                   }}
                 >
                   <User className="w-5 h-5 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  {/* 닉네임 표시 / 편집 */}
                   {isEditingNick ? (
                     <div>
                       <div className="flex items-center gap-1 mb-1">
@@ -166,17 +175,17 @@ export default function ProfileMenu() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 group/nick">
-                      <p className="text-sm font-bold text-purple-700 truncate">{displayName}</p>
+                      <p className="text-sm font-bold truncate" style={{ color: 'var(--t-text)' }}>{displayName}</p>
                       <button
                         onClick={startEdit}
                         className="p-0.5 rounded opacity-0 group-hover/nick:opacity-100 hover:bg-purple-100 transition-all flex-shrink-0"
                         title="닉네임 변경"
                       >
-                        <Pencil className="w-3 h-3 text-purple-400" />
+                        <Pencil className="w-3 h-3" style={{ color: 'var(--t-text-light)' }} />
                       </button>
                     </div>
                   )}
-                  <p className="text-xs text-purple-400 truncate">{user.email}</p>
+                  <p className="text-xs truncate" style={{ color: 'var(--t-text-light)' }}>{user.email}</p>
                 </div>
               </div>
               <div
@@ -186,12 +195,61 @@ export default function ProfileMenu() {
                 }}
               >
                 <Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
-                <p className="text-xs text-purple-600">클라우드 동기화 활성화</p>
+                <p className="text-xs" style={{ color: 'var(--t-text-soft)' }}>클라우드 동기화 활성화</p>
               </div>
             </div>
 
             {/* Menu Items */}
             <div className="py-2">
+
+              {/* 테마 변경 (아코디언) */}
+              <button
+                onClick={() => setShowThemeMenu((v) => !v)}
+                className="w-full px-4 py-2.5 flex items-center gap-3 transition-all hover:bg-white/60"
+              >
+                <Palette className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--t-c2)' }} />
+                <span className="text-sm flex-1 text-left" style={{ color: 'var(--t-text)' }}>테마 변경</span>
+                {/* 현재 테마 스와치 미리보기 */}
+                <div className="flex gap-0.5 mr-1">
+                  {currentTheme.swatch.map((c, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
+                  ))}
+                </div>
+                <ChevronDown
+                  className="w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200"
+                  style={{
+                    color: 'var(--t-text-light)',
+                    transform: showThemeMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }}
+                />
+              </button>
+
+              {/* 테마 목록 인라인 */}
+              {showThemeMenu && (
+                <div className="mx-3 mb-1 rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.55)' }}>
+                  {THEMES.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => { setTheme(t.id); setIsOpen(false) }}
+                      className="w-full px-3 py-2 flex items-center gap-2.5 transition-all hover:bg-white/80"
+                    >
+                      <div className="flex gap-0.5 flex-shrink-0">
+                        {t.swatch.map((c, i) => (
+                          <div key={i} className="w-3 h-3 rounded-full shadow-sm" style={{ background: c }} />
+                        ))}
+                      </div>
+                      <span className="text-xs flex-1 text-left font-medium" style={{ color: 'var(--t-text)' }}>
+                        {t.emoji} {t.name}
+                      </span>
+                      {currentTheme.id === t.id && (
+                        <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--t-c1)' }} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* 로그아웃 */}
               <button
                 onClick={() => { signOut(); setIsOpen(false) }}
                 className="w-full px-4 py-2.5 flex items-center gap-3 transition-all hover:bg-red-50"
@@ -208,7 +266,7 @@ export default function ProfileMenu() {
                 background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.5))',
               }}
             >
-              <p className="text-xs text-center text-purple-400">
+              <p className="text-xs text-center" style={{ color: 'var(--t-text-light)' }}>
                 모든 데이터가 안전하게 동기화됐어요 ☁️
               </p>
             </div>

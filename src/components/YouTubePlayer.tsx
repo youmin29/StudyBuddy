@@ -300,12 +300,12 @@ export default function YouTubePlayer() {
                 <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl text-center shadow-lg">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
-                    style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)' }}
+                    style={{ background: 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)' }}
                   >
                     <Play className="w-8 h-8 text-white fill-white ml-1" />
                   </div>
-                  <p className="text-purple-700 font-medium mb-1">Ready to study!</p>
-                  <p className="text-purple-500 text-xs">아래에 YouTube URL을 붙여넣으세요</p>
+                  <p className="font-medium mb-1" style={{ color: 'var(--t-text-soft)' }}>Ready to study!</p>
+                  <p className="text-xs" style={{ color: 'var(--t-text-light)' }}>아래에 YouTube URL을 붙여넣으세요</p>
                 </div>
               </div>
             )}
@@ -316,7 +316,7 @@ export default function YouTubePlayer() {
             <div className="mb-3 text-center">
               <div className="inline-flex items-center gap-2 bg-white/70 px-4 py-2 rounded-2xl shadow-sm">
                 <span className="text-lg">{currentPlaylist.emoji}</span>
-                <span className="text-sm font-medium text-purple-700">{currentPlaylist.name}</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--t-text-soft)' }}>{currentPlaylist.name}</span>
               </div>
             </div>
           )}
@@ -329,8 +329,10 @@ export default function YouTubePlayer() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 px-4 py-2.5 rounded-2xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none transition-all text-sm text-purple-800 placeholder-purple-300"
+              className="flex-1 px-4 py-2.5 rounded-2xl border-2 focus:outline-none transition-all text-sm"
               style={{
+                borderColor: 'color-mix(in srgb, var(--t-c2) 40%, transparent)',
+                color: 'var(--t-text)',
                 background: 'linear-gradient(to bottom, #ffffff, #fefbff)',
                 boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.08)',
               }}
@@ -338,7 +340,7 @@ export default function YouTubePlayer() {
             <button
               onClick={handleLoad}
               className="px-4 py-2.5 rounded-2xl text-white font-medium text-sm transition-all hover:opacity-90 active:scale-95"
-              style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)' }}
+              style={{ background: 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)' }}
             >
               재생
             </button>
@@ -356,8 +358,8 @@ export default function YouTubePlayer() {
                 }}
               >
                 <div className="flex items-center justify-center gap-2">
-                  <Bookmark className="w-4 h-4 text-purple-600" />
-                  <span className="text-purple-700 font-medium">재생목록 저장</span>
+                  <Bookmark className="w-4 h-4" style={{ color: 'var(--t-text-soft)' }} />
+                  <span className="font-medium" style={{ color: 'var(--t-text-soft)' }}>재생목록 저장</span>
                 </div>
               </button>
             </div>
@@ -415,7 +417,7 @@ export default function YouTubePlayer() {
                         key={e}
                         onClick={() => { setPlaylistEmoji(e); setShowEmojiPicker(false) }}
                         className={`h-8 rounded-lg text-base flex items-center justify-center transition-all hover:scale-110 ${
-                          playlistEmoji === e ? 'bg-pink-100' : 'hover:bg-pink-50'
+                          playlistEmoji === e ? 'opacity-100' : 'opacity-70'
                         }`}
                       >
                         {e}
@@ -430,8 +432,8 @@ export default function YouTubePlayer() {
                   onClick={saveCurrentPlaylist}
                   className="flex-1 px-3 py-2 text-sm rounded-xl transition-all hover:scale-105"
                   style={{
-                    background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(255,107,157,0.4)',
+                    background: 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px var(--t-c1-glow)',
                   }}
                 >
                   <span className="text-white font-medium">저장</span>
@@ -440,7 +442,7 @@ export default function YouTubePlayer() {
                   onClick={closeSaveDialog}
                   className="px-4 py-2 text-sm rounded-xl transition-all bg-white/60 hover:bg-white/80"
                 >
-                  <span className="text-purple-600">취소</span>
+                  <span style={{ color: 'var(--t-text-soft)' }}>취소</span>
                 </button>
               </div>
             </div>
@@ -461,14 +463,14 @@ export default function YouTubePlayer() {
                 disabled={!canShuffle}
                 className="p-2 rounded-xl transition-all"
                 style={{
-                  background: isShuffle ? 'rgba(167,139,250,0.2)' : 'transparent',
+                  background: isShuffle ? 'color-mix(in srgb, var(--t-c2) 20%, transparent)' : 'transparent',
                   cursor: canShuffle ? 'pointer' : 'not-allowed',
                   opacity: canShuffle ? 1 : 0.35,
                 }}
               >
                 <Shuffle
                   className="w-5 h-5"
-                  style={{ color: isShuffle ? '#7C3AED' : '#A78BFA' }}
+                  style={{ color: isShuffle ? 'var(--t-c2b)' : 'var(--t-c2)' }}
                 />
               </button>
 
@@ -476,9 +478,9 @@ export default function YouTubePlayer() {
                 onClick={togglePlay}
                 className="p-3 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg"
                 style={{
-                  background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)',
+                  background: 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)',
                   boxShadow:
-                    'inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(255,107,157,0.4)',
+                    'inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px var(--t-c1-glow)',
                 }}
               >
                 {isPlaying ? (
@@ -501,7 +503,7 @@ export default function YouTubePlayer() {
               >
                 <SkipForward
                   className="w-5 h-5"
-                  style={{ color: canSkipNext ? '#A78BFA' : '#C4B5FD' }}
+                  style={{ color: canSkipNext ? 'var(--t-c2)' : 'var(--t-c2-soft)' }}
                 />
               </button>
 
@@ -511,30 +513,31 @@ export default function YouTubePlayer() {
                 title={isRepeat ? '반복 끄기' : '반복 켜기'}
                 className="p-2 rounded-xl transition-all"
                 style={{
-                  background: isRepeat ? 'rgba(167,139,250,0.2)' : 'transparent',
+                  background: isRepeat ? 'color-mix(in srgb, var(--t-c2) 20%, transparent)' : 'transparent',
                 }}
               >
                 <Repeat
                   className="w-5 h-5"
-                  style={{ color: isRepeat ? '#7C3AED' : '#A78BFA' }}
+                  style={{ color: isRepeat ? 'var(--t-c2b)' : 'var(--t-c2)' }}
                 />
               </button>
             </div>
 
             <div className="flex items-center gap-3">
-              <Volume2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <Volume2 className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--t-text-light)' }} />
               <input
                 type="range"
                 min={0}
                 max={100}
                 value={volume}
                 onChange={handleVolumeChange}
-                className="flex-1 h-1.5 rounded-full accent-purple-400 cursor-pointer"
+                className="flex-1 h-1.5 rounded-full cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, #A78BFA ${volume}%, #E9D5FF ${volume}%)`,
+                  background: `linear-gradient(to right, var(--t-c2) ${volume}%, var(--t-c2-soft) ${volume}%)`,
+                  accentColor: 'var(--t-c2)',
                 }}
               />
-              <span className="text-xs text-purple-400 w-6 text-right tabular-nums">{volume}</span>
+              <span className="text-xs w-6 text-right tabular-nums" style={{ color: 'var(--t-text-light)' }}>{volume}</span>
             </div>
           </div>
         </div>
@@ -558,11 +561,11 @@ export default function YouTubePlayer() {
               onClick={() => setRightTab('library')}
               className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-medium transition-all"
               style={rightTab === 'library' ? {
-                background: 'linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%)',
+                background: 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c1b) 100%)',
                 color: 'white',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(255,107,157,0.35)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px var(--t-c1-glow)',
               } : {
-                color: '#9333EA',
+                color: 'var(--t-text-soft)',
               }}
             >
               <Music2 className="w-3 h-3" />
@@ -572,11 +575,11 @@ export default function YouTubePlayer() {
               onClick={() => setRightTab('timer')}
               className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-medium transition-all"
               style={rightTab === 'timer' ? {
-                background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)',
+                background: 'linear-gradient(135deg, var(--t-c2) 0%, var(--t-c2b) 100%)',
                 color: 'white',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(167,139,250,0.35)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px var(--t-c2-glow)',
               } : {
-                color: '#9333EA',
+                color: 'var(--t-text-soft)',
               }}
             >
               <Timer className="w-3 h-3" />
@@ -589,24 +592,24 @@ export default function YouTubePlayer() {
             <>
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <Music2 className="w-4 h-4 text-pink-500" />
-                  <h3 className="font-bold text-pink-700" style={{ fontSize: '15px' }}>
+                  <Music2 className="w-4 h-4" style={{ color: 'var(--t-c1)' }} />
+                  <h3 className="font-bold" style={{ fontSize: '15px', color: 'var(--t-text)' }}>
                     Playlist Library
                   </h3>
                 </div>
-                <p className="text-xs text-pink-400">Saved playlists</p>
+                <p className="text-xs" style={{ color: 'var(--t-text-light)' }}>Saved playlists</p>
               </div>
 
               <div
                 className="flex-1 overflow-y-auto pr-1 space-y-4"
-                style={{ scrollbarWidth: 'thin', scrollbarColor: '#F9A8D4 #FCE7F3' }}
+                style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--t-scroll) var(--t-scroll-track)' }}
               >
                 {favoritePlaylists.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-2.5">
                       <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-200 to-rose-200 px-2.5 py-1 rounded-full shadow-sm">
-                        <Heart className="w-3 h-3 text-pink-600 fill-pink-600" />
-                        <span className="text-xs font-bold text-pink-700">즐겨찾기</span>
+                        <Heart className="w-3 h-3" style={{ color: 'var(--t-c1)', fill: 'var(--t-c1)' }} />
+                        <span className="text-xs font-bold" style={{ color: 'var(--t-text)' }}>즐겨찾기</span>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -631,10 +634,10 @@ export default function YouTubePlayer() {
                           >
                             <div className="flex items-center gap-2">
                               <span className="text-xl flex-shrink-0">{playlist.emoji}</span>
-                              <p className="flex-1 text-sm font-medium text-pink-700 truncate min-w-0">{playlist.name}</p>
+                              <p className="flex-1 text-sm font-medium truncate min-w-0" style={{ color: 'var(--t-text-soft)' }}>{playlist.name}</p>
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(playlist.id) }} className="p-1 rounded-lg hover:bg-pink-100 transition-all">
-                                  <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+                                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(playlist.id) }} className="p-1 rounded-lg transition-all" style={{ background: 'color-mix(in srgb, var(--t-c1) 12%, transparent)' }}>
+                                  <Heart className="w-3.5 h-3.5" style={{ color: 'var(--t-c1)', fill: 'var(--t-c1)' }} />
                                 </button>
                                 <button onClick={(e) => { e.stopPropagation(); deletePlaylist(playlist.id) }} className="p-1 rounded-lg hover:bg-red-100 transition-all">
                                   <Trash2 className="w-3.5 h-3.5 text-red-400" />
@@ -651,7 +654,7 @@ export default function YouTubePlayer() {
                 {favoritePlaylists.length > 0 && recentPlaylists.length > 0 && (
                   <div className="flex items-center gap-2 py-1">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent" />
-                    <div className="text-xs text-pink-300">✦</div>
+                    <div className="text-xs" style={{ color: 'var(--t-text-light)' }}>✦</div>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent" />
                   </div>
                 )}
@@ -659,9 +662,9 @@ export default function YouTubePlayer() {
                 {recentPlaylists.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-2.5">
-                      <div className="bg-purple-100/60 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                        <Clock className="w-3 h-3 text-purple-600" />
-                        <span className="text-xs font-medium text-purple-600">최근</span>
+                      <div className="px-2.5 py-1 rounded-full flex items-center gap-1.5" style={{ background: 'color-mix(in srgb, var(--t-c2) 15%, transparent)' }}>
+                        <Clock className="w-3 h-3" style={{ color: 'var(--t-c2b)' }} />
+                        <span className="text-xs font-medium" style={{ color: 'var(--t-text-soft)' }}>최근</span>
                       </div>
                     </div>
                     <div className="space-y-1.5">
@@ -669,8 +672,9 @@ export default function YouTubePlayer() {
                         <button
                           key={playlist.id}
                           onClick={() => loadPlaylist(playlist)}
-                          className="w-full text-left rounded-lg px-3 py-2.5 border border-purple-100/50 transition-all hover:bg-white/80 hover:shadow-md active:scale-[0.98] group"
+                          className="w-full text-left rounded-lg px-3 py-2.5 transition-all hover:bg-white/80 hover:shadow-md active:scale-[0.98] group"
                           style={{
+                            border: '1px solid color-mix(in srgb, var(--t-c2) 20%, transparent)',
                             background: currentPlaylist?.id === playlist.id
                               ? 'linear-gradient(135deg, #F8F0FF 0%, #FFF0F8 100%)'
                               : 'rgba(255,255,255,0.5)',
@@ -680,16 +684,16 @@ export default function YouTubePlayer() {
                           <div className="flex items-center gap-2">
                             <span className="text-lg flex-shrink-0">{playlist.emoji}</span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-purple-700 truncate">{playlist.name}</p>
+                              <p className="text-xs font-medium truncate" style={{ color: 'var(--t-text-soft)' }}>{playlist.name}</p>
                               {playlist.lastPlayed && (
-                                <p className="text-xs text-purple-400 mt-0.5">
+                                <p className="text-xs mt-0.5" style={{ color: 'var(--t-text-light)' }}>
                                   {new Date(playlist.lastPlayed).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                                 </p>
                               )}
                             </div>
                             <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={(e) => { e.stopPropagation(); toggleFavorite(playlist.id) }} className="p-1 rounded-md hover:bg-pink-100 transition-all">
-                                <Heart className={`w-3 h-3 ${playlist.isFavorite ? 'text-pink-500 fill-pink-500' : 'text-purple-300'}`} />
+                              <button onClick={(e) => { e.stopPropagation(); toggleFavorite(playlist.id) }} className="p-1 rounded-md transition-all" style={{ background: 'color-mix(in srgb, var(--t-c1) 10%, transparent)' }}>
+                                <Heart className="w-3 h-3" style={{ color: playlist.isFavorite ? 'var(--t-c1)' : 'var(--t-text-light)', fill: playlist.isFavorite ? 'var(--t-c1)' : 'none' }} />
                               </button>
                               <button onClick={(e) => { e.stopPropagation(); deletePlaylist(playlist.id) }} className="p-1 rounded-md hover:bg-red-100 transition-all">
                                 <Trash2 className="w-3 h-3 text-red-400" />
@@ -707,12 +711,12 @@ export default function YouTubePlayer() {
                     <div className="bg-white/50 backdrop-blur-sm p-5 rounded-2xl inline-block shadow-sm">
                       <div
                         className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md"
-                        style={{ background: 'linear-gradient(135deg, #F9A8D4 0%, #C4B5FD 100%)' }}
+                        style={{ background: 'linear-gradient(135deg, var(--t-scroll) 0%, var(--t-c2-soft) 100%)' }}
                       >
                         <Music2 className="w-6 h-6 text-white" />
                       </div>
-                      <p className="text-pink-600 text-xs font-medium mb-1">저장된 재생목록 없음</p>
-                      <p className="text-pink-400 text-xs">URL 입력 후 저장해보세요!</p>
+                      <p className="text-xs font-medium mb-1" style={{ color: 'var(--t-text-soft)' }}>저장된 재생목록 없음</p>
+                      <p className="text-xs" style={{ color: 'var(--t-text-light)' }}>URL 입력 후 저장해보세요!</p>
                     </div>
                   </div>
                 )}

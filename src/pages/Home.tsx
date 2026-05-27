@@ -5,10 +5,17 @@ import MiniCalendar from '../components/MiniCalendar'
 import TodoPanel from '../components/TodoPanel'
 import { useTodoStore } from '../store/useTodoStore'
 import { useAuthStore } from '../store/useAuthStore'
+import { useThemeStore } from '../store/useThemeStore'
 
 export default function Home() {
   const { user, loading } = useAuthStore()
   const { setSelectedDate, loadTodoCounts, loadSettings } = useTodoStore()
+  const { theme, loadTheme } = useThemeStore()
+
+  useEffect(() => {
+    loadTheme()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 로그인 상태가 바뀔 때마다 (로그인·로그아웃·초기 로드) 데이터 새로 로드
   // loading이 false가 된 후부터 user 변화를 감지
@@ -23,9 +30,7 @@ export default function Home() {
   return (
     <div
       className="h-screen overflow-hidden flex items-center justify-center p-4"
-      style={{
-        background: 'linear-gradient(135deg, #FFF5F7 0%, #E8F4FF 50%, #F5E8FF 100%)',
-      }}
+      style={{ background: theme.pageBg }}
     >
       <div
         className="w-full max-w-6xl h-full max-h-[920px] flex flex-col overflow-hidden"
@@ -40,7 +45,10 @@ export default function Home() {
       >
         <Header />
 
-        <div className="flex-1 min-h-0 p-5 overflow-y-auto">
+        <div
+          className="flex-1 min-h-0 p-5 overflow-y-auto"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--t-scroll) var(--t-scroll-track)' }}
+        >
           <div className="mb-5">
             <YouTubePlayer />
           </div>

@@ -33,21 +33,30 @@ const getModeInfo = (mode: TimerMode) => {
         icon: Brain,
         label: "집중 세션",
         emoji: "💻",
-        color: "#FF6B9D",
+        color: "var(--t-c1)",
+        colorDark: "var(--t-c1b)",
+        glow: "var(--t-c1-glow)",
+        soft: "color-mix(in srgb, var(--t-c1) 22%, transparent)",
       };
     case "shortBreak":
       return {
         icon: Coffee,
         label: "짧은 휴식",
         emoji: "☕",
-        color: "#A78BFA",
+        color: "var(--t-c2)",
+        colorDark: "var(--t-c2b)",
+        glow: "var(--t-c2-glow)",
+        soft: "color-mix(in srgb, var(--t-c2) 22%, transparent)",
       };
     case "longBreak":
       return {
         icon: BedDouble,
         label: "긴 휴식",
         emoji: "🛏️",
-        color: "#60A5FA",
+        color: "var(--t-c2)",
+        colorDark: "var(--t-c2b)",
+        glow: "var(--t-c2-glow)",
+        soft: "color-mix(in srgb, var(--t-c2) 22%, transparent)",
       };
   }
 };
@@ -298,7 +307,7 @@ export default function PomodoroTimer() {
                 className="relative px-6 py-4"
                 style={{
                   background:
-                    "linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)",
+                    "linear-gradient(135deg, var(--t-c2) 0%, var(--t-c2b) 100%)",
                   boxShadow:
                     "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.1)",
                 }}
@@ -312,7 +321,7 @@ export default function PomodoroTimer() {
                           "inset 0 1px 2px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.2)",
                       }}
                     >
-                      <Timer className="w-4 h-4 text-purple-500" />
+                      <Timer className="w-4 h-4" style={{ color: 'var(--t-c2)' }} />
                     </div>
                     <h3
                       className="text-white font-bold drop-shadow-md"
@@ -344,19 +353,19 @@ export default function PomodoroTimer() {
                     {
                       key: "focus",
                       label: "💻 집중",
-                      color: "#FF6B9D",
+                      color: "var(--t-c1)",
                       desc: "집중 세션 시간",
                     },
                     {
                       key: "shortBreak",
                       label: "☕ 짧은 휴식",
-                      color: "#A78BFA",
+                      color: "var(--t-c2)",
                       desc: "짧은 휴식 시간",
                     },
                     {
                       key: "longBreak",
-                      label: "💖 긴 휴식",
-                      color: "#60A5FA",
+                      label: "🛏️ 긴 휴식",
+                      color: "var(--t-c2b)",
                       desc: "긴 휴식 시간 (4세션마다)",
                     },
                   ] as {
@@ -376,10 +385,10 @@ export default function PomodoroTimer() {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-purple-700">
+                        <p className="text-sm font-medium" style={{ color: 'var(--t-text)' }}>
                           {label}
                         </p>
-                        <p className="text-xs text-purple-400 mt-0.5">{desc}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'var(--t-text-light)' }}>{desc}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <input
@@ -395,12 +404,12 @@ export default function PomodoroTimer() {
                           }
                           className="w-14 px-2 py-1.5 text-sm text-center rounded-xl border-2 focus:outline-none transition-all tabular-nums font-bold"
                           style={{
-                            borderColor: `${color}60`,
+                            borderColor: `color-mix(in srgb, ${color} 38%, transparent)`,
                             color,
-                            background: `${color}12`,
+                            background: `color-mix(in srgb, ${color} 7%, transparent)`,
                           }}
                         />
-                        <span className="text-xs text-purple-400 w-5">분</span>
+                        <span className="text-xs w-5" style={{ color: 'var(--t-text-light)' }}>분</span>
                       </div>
                     </div>
                   </div>
@@ -417,8 +426,8 @@ export default function PomodoroTimer() {
               >
                 <button
                   onClick={cancelSettings}
-                  className="flex-1 px-4 py-2.5 rounded-2xl text-purple-600 font-medium text-sm transition-all hover:bg-white/60"
-                  style={{ background: "rgba(255,255,255,0.5)" }}
+                  className="flex-1 px-4 py-2.5 rounded-2xl font-medium text-sm transition-all hover:bg-white/60"
+                  style={{ color: 'var(--t-text-soft)', background: "rgba(255,255,255,0.5)" }}
                 >
                   취소
                 </button>
@@ -427,7 +436,7 @@ export default function PomodoroTimer() {
                   className="flex-1 px-4 py-2.5 rounded-2xl text-white font-medium text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
                   style={{
                     background:
-                      "linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)",
+                      "linear-gradient(135deg, var(--t-c2) 0%, var(--t-c2b) 100%)",
                     boxShadow:
                       "inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 12px rgba(167,139,250,0.4)",
                   }}
@@ -458,16 +467,16 @@ export default function PomodoroTimer() {
               <div
                 className="px-6 py-5 text-center"
                 style={{
-                  background: `linear-gradient(135deg, ${modeInfo.color}40 0%, ${modeInfo.color}20 100%)`,
+                  background: `linear-gradient(135deg, ${modeInfo.soft} 0%, color-mix(in srgb, ${modeInfo.color} 10%, transparent) 100%)`,
                 }}
               >
                 <div className="text-5xl mb-3 animate-pulse">
                   {completionMsg.emoji}
                 </div>
-                <h3 className="text-lg font-bold text-purple-700 mb-1">
+                <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--t-text)' }}>
                   {completionMsg.title}
                 </h3>
-                <p className="text-sm text-purple-600">
+                <p className="text-sm" style={{ color: 'var(--t-text-soft)' }}>
                   {completionMsg.message}
                 </p>
               </div>
@@ -486,7 +495,7 @@ export default function PomodoroTimer() {
           <div
             className="p-1.5 rounded-lg flex-shrink-0"
             style={{
-              background: `linear-gradient(135deg, ${modeInfo.color} 0%, ${modeInfo.color}CC 100%)`,
+              background: `linear-gradient(135deg, ${modeInfo.color} 0%, ${modeInfo.colorDark} 100%)`,
               boxShadow:
                 "inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.15)",
             }}
@@ -494,8 +503,8 @@ export default function PomodoroTimer() {
             <ModeIcon className="w-3.5 h-3.5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-purple-700">Pomodoro Timer</p>
-            <p className="text-xs text-purple-400">
+            <p className="text-xs font-bold" style={{ color: 'var(--t-text)' }}>Pomodoro</p>
+            <p className="text-xs" style={{ color: 'var(--t-text-light)' }}>
               {sessionCount}번 집중 완료
             </p>
           </div>
@@ -507,7 +516,7 @@ export default function PomodoroTimer() {
             className="p-1.5 rounded-lg transition-all hover:bg-white/60"
             title="타이머 시간 설정"
           >
-            <Settings className="w-3.5 h-3.5 text-purple-400" />
+            <Settings className="w-3.5 h-3.5" style={{ color: 'var(--t-text-light)' }} />
           </button>
         </div>
 
@@ -524,13 +533,13 @@ export default function PomodoroTimer() {
                 style={
                   active
                     ? {
-                        background: `linear-gradient(135deg, ${info.color} 0%, ${info.color}CC 100%)`,
+                        background: `linear-gradient(135deg, ${info.color} 0%, ${info.colorDark} 100%)`,
                         color: "white",
-                        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px ${info.color}66`,
+                        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px ${info.glow}`,
                       }
                     : {
                         background: "rgba(255,255,255,0.5)",
-                        color: "#7C3AED",
+                        color: "var(--t-c2b)",
                       }
                 }
               >
@@ -556,7 +565,7 @@ export default function PomodoroTimer() {
               className="h-full transition-all duration-1000 ease-linear"
               style={{
                 width: `${getProgress()}%`,
-                background: `linear-gradient(90deg, ${modeInfo.color} 0%, ${modeInfo.color}CC 100%)`,
+                background: `linear-gradient(90deg, ${modeInfo.color} 0%, ${modeInfo.colorDark} 100%)`,
               }}
             />
           </div>
@@ -569,7 +578,7 @@ export default function PomodoroTimer() {
             </div>
             <div className="flex items-center justify-center gap-1.5">
               <span className="text-base">{modeInfo.emoji}</span>
-              <span className="text-xs font-medium text-purple-600">
+              <span className="text-xs font-medium" style={{ color: 'var(--t-text-soft)' }}>
                 {modeInfo.label}
               </span>
             </div>
@@ -582,8 +591,8 @@ export default function PomodoroTimer() {
             onClick={toggleTimer}
             className="flex-1 py-2.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{
-              background: `linear-gradient(135deg, ${modeInfo.color} 0%, ${modeInfo.color}CC 100%)`,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 10px ${modeInfo.color}55`,
+              background: `linear-gradient(135deg, ${modeInfo.color} 0%, ${modeInfo.colorDark} 100%)`,
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 10px ${modeInfo.glow}`,
             }}
           >
             <div className="flex items-center justify-center gap-1.5">
@@ -607,7 +616,7 @@ export default function PomodoroTimer() {
             }}
             title="현재 타이머 초기화"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-purple-600" />
+            <RotateCcw className="w-3.5 h-3.5" style={{ color: 'var(--t-text-soft)' }} />
           </button>
         </div>
 
@@ -616,14 +625,14 @@ export default function PomodoroTimer() {
           className="mb-3 px-3 py-2.5 rounded-xl flex items-center gap-2"
           style={{
             background: "rgba(255,255,255,0.6)",
-            border: "1px solid rgba(255,107,157,0.2)",
+            border: "1px solid color-mix(in srgb, var(--t-c1) 20%, transparent)",
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8)",
           }}
         >
-          <Clock className="w-3.5 h-3.5 text-pink-400 flex-shrink-0" />
+          <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--t-c1)' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-purple-500">총 집중 시간</p>
-            <p className="text-sm font-bold text-pink-600 tabular-nums">
+            <p className="text-xs" style={{ color: 'var(--t-text-soft)' }}>총 집중 시간</p>
+            <p className="text-sm font-bold tabular-nums" style={{ color: 'var(--t-c1)' }}>
               {totalFocusSecs > 0
                 ? formatTotalTime(totalFocusSecs)
                 : "아직 없어요"}
