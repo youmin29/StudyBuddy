@@ -66,6 +66,7 @@ interface Window {
       set: (key: string, value: string) => Promise<{ success: boolean }>
       remove: (key: string) => Promise<{ success: boolean }>
     }
+    openUrl: (url: string) => Promise<void>
   }
   ipcRenderer: import('electron').IpcRenderer
 }

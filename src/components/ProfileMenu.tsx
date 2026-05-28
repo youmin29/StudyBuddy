@@ -1,7 +1,21 @@
-import { Cloud, LogOut, User, Check, Pencil, X, Palette, ChevronDown } from 'lucide-react'
+import { Cloud, LogOut, User, Check, Pencil, X, Palette, ChevronDown, Download } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useThemeStore, THEMES } from '../store/useThemeStore'
+
+// ── 업데이트 체크 (앱 수명 동안 한 번만) ──
+const GITHUB_REPO = 'youmin29/StudyBuddy'
+interface UpdateInfo { version: string; url: string }
+let cachedUpdateResult: UpdateInfo | null | 'done' = null
+
+function isNewerVersion(latest: string, current: string): boolean {
+  const toNums = (v: string) => v.replace(/^v/, '').split('.').map(Number)
+  const [la, lb, lc] = toNums(latest)
+  const [ca, cb, cc] = toNums(current)
+  if (la !== ca) return la > ca
+  if (lb !== cb) return lb > cb
+  return lc > cc
+}
 
 export default function ProfileMenu() {
   const { user, signOut, updateNickname } = useAuthStore()
@@ -20,10 +34,36 @@ export default function ProfileMenu() {
   // 테마 아코디언
   const [showThemeMenu, setShowThemeMenu] = useState(false)
 
+  // 업데이트 정보
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(
+    cachedUpdateResult !== null && cachedUpdateResult !== 'done' ? cachedUpdateResult : null
+  )
+
   // 드롭다운 닫히면 서브메뉴도 닫기
   useEffect(() => {
     if (!isOpen) setShowThemeMenu(false)
   }, [isOpen])
+
+  // GitHub Releases API로 최신 버전 확인 (앱 수명 동안 한 번만)
+  useEffect(() => {
+    if (cachedUpdateResult !== null) return
+    cachedUpdateResult = 'done' // 중복 요청 방지
+
+    fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
+      headers: { Accept: 'application/vnd.github+json' },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        const latest: string = data.tag_name ?? ''
+        if (latest && isNewerVersion(latest, __APP_VERSION__)) {
+          const info: UpdateInfo = { version: latest, url: data.html_url }
+          cachedUpdateResult = info
+          setUpdateInfo(info)
+        }
+      })
+      .catch(() => { /* 네트워크 오류 시 조용히 무시 */ })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (!user) return null
 
@@ -266,9 +306,30 @@ export default function ProfileMenu() {
                 background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.5))',
               }}
             >
-              <p className="text-xs text-center" style={{ color: 'var(--t-text-light)' }}>
-                모든 데이터가 안전하게 동기화됐어요 ☁️
-              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--t-text-light)' }}>
+                  v{__APP_VERSION__}
+                </span>
+                <p className="text-xs" style={{ color: 'var(--t-text-light)' }}>
+                  ☁️ 동기화됨
+                </p>
+              </div>
+
+              {/* 업데이트 있을 때만 표시 */}
+              {updateInfo && (
+                <button
+                  onClick={() => window.electronAPI.openUrl(updateInfo.url)}
+                  className="mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all hover:opacity-85 active:scale-95"
+                  style={{
+                    color: 'white',
+                    background: 'linear-gradient(135deg, var(--t-c1) 0%, var(--t-c2) 100%)',
+                    boxShadow: '0 2px 8px var(--t-c1-glow)',
+                  }}
+                >
+                  <Download className="w-3 h-3" />
+                  {updateInfo.version} 업데이트 다운로드
+                </button>
+              )}
             </div>
           </div>
         </>

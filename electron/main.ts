@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session } from 'electron'
+import { app, BrowserWindow, ipcMain, session, shell } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -204,6 +204,11 @@ function setupIpcHandlers() {
     } catch {
       return { success: false }
     }
+  })
+
+  // ── 외부 URL을 기본 브라우저로 열기 ──
+  ipcMain.handle('app:open-url', (_event, url: string) => {
+    shell.openExternal(url)
   })
 }
 

@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     set: (key: string, value: string) => ipcRenderer.invoke('auth:storage-set', key, value),
     remove: (key: string) => ipcRenderer.invoke('auth:storage-remove', key),
   },
+  openUrl: (url: string) => ipcRenderer.invoke('app:open-url', url),
 })
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
