@@ -105,10 +105,10 @@ npm run build
 빌드가 완료되면 아래 경로에 결과물이 생성됩니다.
 
 ```
-release/1.4.0/
+release/1.4.1/
 ├── mac-arm64/Study Buddy.app              ← macOS: 바로 실행 가능
-├── Study Buddy-Mac-1.4.0-Installer.dmg    ← macOS: 설치 패키지
-└── Study Buddy-Windows-1.4.0-Setup.exe   ← Windows: 설치 파일
+├── Study Buddy-Mac-1.4.1-Installer.dmg    ← macOS: 설치 패키지
+└── Study Buddy-Windows-1.4.1-Setup.exe   ← Windows: 설치 파일
 ```
 
 > **팁**: DMG 설치 없이 `mac-arm64` 폴더 안의 `.app`을 더블클릭해서 바로 실행할 수 있습니다.
@@ -119,8 +119,8 @@ release/1.4.0/
 GitHub Releases에 DMG, EXE 파일이 자동 업로드됩니다.
 
 ```bash
-git tag v1.4.0
-git push origin v1.4.0
+git tag v1.4.1
+git push origin v1.4.1
 ```
 
 ---

@@ -52,8 +52,12 @@ export default function ProfileMenu() {
     fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
       headers: { Accept: 'application/vnd.github+json' },
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) return null   // 릴리즈 없음(404) 또는 기타 에러 → 무시
+        return r.json()
+      })
       .then((data) => {
+        if (!data) return
         const latest: string = data.tag_name ?? ''
         if (latest && isNewerVersion(latest, __APP_VERSION__)) {
           const info: UpdateInfo = { version: latest, url: data.html_url }

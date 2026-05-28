@@ -40,6 +40,20 @@ export default function YouTubePlayer() {
   const isRepeatRef = useRef(false)
   const [rightTab, setRightTab] = useState<'library' | 'timer'>('library')
 
+  // 왼쪽 패널 높이를 측정해 오른쪽 패널에 동일하게 적용
+  const leftPanelRef = useRef<HTMLDivElement>(null)
+  const [rightPanelHeight, setRightPanelHeight] = useState<number | null>(null)
+
+  useEffect(() => {
+    const el = leftPanelRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      setRightPanelHeight(entry.contentRect.height)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // user 변경 시(로그인·로그아웃)마다 플레이리스트 다시 로드
   useEffect(() => {
     const load = async () => {
@@ -267,9 +281,10 @@ export default function YouTubePlayer() {
   }
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 gap-4 items-start">
       {/* Main Player – left 2 columns */}
       <div
+        ref={leftPanelRef}
         className="col-span-2 rounded-3xl overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #E8F5FF 0%, #FFF0F8 100%)',
@@ -545,13 +560,14 @@ export default function YouTubePlayer() {
 
       {/* Right Panel – Playlist Library / Pomodoro Timer */}
       <div
-        className="col-span-1 rounded-3xl overflow-hidden"
+        className="col-span-1 rounded-3xl overflow-hidden flex flex-col"
         style={{
           background: 'linear-gradient(135deg, #FFF9E6 0%, #FFE8F5 100%)',
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.1)',
+          height: rightPanelHeight ?? undefined,
         }}
       >
-        <div className="p-4 h-full flex flex-col">
+        <div className="p-4 flex flex-col flex-1 min-h-0">
           {/* 탭 버튼 */}
           <div
             className="flex gap-1.5 mb-4 p-1 rounded-2xl"
@@ -601,7 +617,7 @@ export default function YouTubePlayer() {
               </div>
 
               <div
-                className="flex-1 overflow-y-auto pr-1 space-y-4"
+                className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-4"
                 style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--t-scroll) var(--t-scroll-track)' }}
               >
                 {favoritePlaylists.length > 0 && (
